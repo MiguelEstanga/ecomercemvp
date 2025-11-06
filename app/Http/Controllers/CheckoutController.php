@@ -62,7 +62,7 @@ class CheckoutController extends Controller
             if (isset($responseParse['error'])) {
                 return view('errors.500');
             }
-            return back()->with('success', 'Order placed successfully!');
+            return redirect()->route('profile.index')->with('success', 'Orden creada exitosamente');
         } catch (\Exception $e) {
             Log::error('Error in CheckoutController store: ' . $e->getMessage());
             return response()->json(['message' => 'Internal Server Error'], 500);

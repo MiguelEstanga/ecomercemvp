@@ -28,9 +28,11 @@
                 <div class="flex justify-between items-center h-16">
 
                     {{-- Logo y Nombre --}}
-                    <div class="flex-shrink-0 flex items-center">
-                        <span class="text-2xl font-bold text-indigo-400">MiApp</span>
-                    </div>
+                    <a href="{{ route('home') }}">
+                        <div class="flex-shrink-0 flex items-center">
+                            <span class="text-2xl font-bold text-indigo-400">MiApp</span>
+                        </div>
+                    </a>
 
                     {{-- Buscador (Centrado y funcionalmente simple) --}}
                     <div class="hidden sm:block">
@@ -41,11 +43,11 @@
                     {{-- Menú de Usuario --}}
                     <div class="flex items-center space-x-4">
                         @auth {{-- Solo si el usuario ha iniciado sesión --}}
-                            <a href=" "
+                            <a href="{{ route('profile.index') }}"
                                 class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition duration-150 ease-in-out">
                                 Perfil
                             </a>
-                            <form method="POST" action=" ">
+                            <form method="POST" action="{{ route('logout') }}">
                                 @csrf
                                 <button type="submit" class="text-sm text-gray-300 hover:text-indigo-400">
                                     Salir
@@ -63,7 +65,7 @@
         </header>
 
 
-        <main class="flex-grow py-10">
+        <main class="flex-grow  ">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 @yield('content')
             </div>

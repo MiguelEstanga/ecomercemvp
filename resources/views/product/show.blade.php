@@ -185,14 +185,14 @@
 
             {{-- Formulario de Comentario --}}
             @auth
-                <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                <div class=" dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
                     <h3 class="text-lg font-semibold mb-4">Escribe tu reseña</h3>
-                    <form action=" " method="POST">
+                    <form action="{{ route('product.comment' , $product_id ) }}" method="POST">
                         @csrf
 
                         {{-- Rating --}}
                         <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Calificación</label>
+                            <label class="block text-sm font-medium text-whitte mb-2">Calificación</label>
                             <div class="flex gap-2" id="rating-stars">
                                 @for ($i = 1; $i <= 5; $i++)
                                     <button type="button" onclick="setRating({{ $i }})"
@@ -209,8 +209,8 @@
 
                         {{-- Comentario --}}
                         <div class="mb-4">
-                            <label for="comment" class="block text-sm font-medium text-gray-700 mb-2">Tu comentario</label>
-                            <textarea name="comment" id="comment" rows="4" required
+                            <label for="comment" class="block text-sm font-medium text-wrhitte mb-2">Tu comentario</label>
+                            <textarea name="content" id="comment" rows="4" required
                                 class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                 placeholder="Cuéntanos tu experiencia con este producto..."></textarea>
                         </div>
@@ -233,8 +233,8 @@
             {{-- Lista de Comentarios --}}
             <div class="space-y-4">
                 {{-- Ejemplo de comentario (repite esto con @foreach para comentarios reales) --}}
-                @forelse($product->reviews ?? [] as $review)
-                    <div class="bg-white rounded-lg shadow-md p-6">
+                @forelse($comment ?? [] as $review)
+                    <div class="bg-gray-800 rounded-lg shadow-md p-6">
                         <div class="flex items-start justify-between mb-3">
                             <div class="flex items-center gap-3">
                                 <div
@@ -244,7 +244,7 @@
                                 <div>
                                     <p class="font-semibold text-gray-900">{{ $review->user->name ?? 'Usuario' }}</p>
                                     <div class="flex items-center gap-2">
-                                        <div class="flex text-yellow-400">
+                                        {{-- <div class="flex text-yellow-400">
                                             @for ($i = 1; $i <= 5; $i++)
                                                 <svg class="w-4 h-4 {{ $i <= ($review->rating ?? 5) ? 'fill-current' : 'fill-gray-300' }}"
                                                     viewBox="0 0 20 20">
@@ -252,25 +252,25 @@
                                                         d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
                                                 </svg>
                                             @endfor
-                                        </div>
+                                        </div> --}}
                                         <span
                                             class="text-xs text-gray-500">{{ $review->created_at->diffForHumans() }}</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <p class="text-gray-700 leading-relaxed">{{ $review->comment }}</p>
+                        <p class="text-whitte leading-relaxed">{{ $review->content }}</p>
                     </div>
                 @empty
-                    <div class="bg-gray-50 rounded-lg p-8 text-center">
-                        <svg class="w-16 h-16 text-gray-400 mx-auto mb-3" fill="none" stroke="currentColor"
+                    <div class="bg-gray-800 rounded-lg p-8 text-center">
+                        <svg class="w-16 h-16 text-whitte mx-auto mb-3" fill="none" stroke="currentColor"
                             viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z">
                             </path>
                         </svg>
-                        <p class="text-gray-600">Aún no hay reseñas para este producto</p>
-                        <p class="text-sm text-gray-500 mt-1">¡Sé el primero en compartir tu opinión!</p>
+                        <p class="text-whitte">Aún no hay reseñas para este producto</p>
+                        <p class="text-sm text-whitte mt-1">¡Sé el primero en compartir tu opinión!</p>
                     </div>
                 @endforelse
             </div>

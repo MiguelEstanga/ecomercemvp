@@ -274,4 +274,8 @@
             <div class="h-14.5 hidden lg:block"></div>
         @endif
     </body>
+    <script>
+        const vamos = "console log en tiempo real";
+        console.log(vamos)
+    </script>
 </html>

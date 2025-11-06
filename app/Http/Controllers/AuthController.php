@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\services\AuthServices;
 use \Exception; // Para capturar errores genéricos
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 class AuthController extends Controller
 {
     protected $authService;
@@ -30,6 +31,12 @@ class AuthController extends Controller
             Log::error('Login error: ' . $e->getMessage());
             return response()->json(['error' => $e->getMessage()], 401);
         }
+    }
+
+    public function logout(Request $request)
+    {
+        Auth::logout();
+        return redirect()->route('login');
     }
 
     public function loginView(){
