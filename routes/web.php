@@ -8,6 +8,8 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\UserController;
+use Illuminate\Support\Facades\Artisan;
+
 Route::get('/',  [MainController::class, 'index'])->name('home');
 
 
@@ -18,7 +20,7 @@ Route::get('/login', [AuthController::class, 'loginView'])->name('login');
 
 Route::prefix('product')->group(function () {
   Route::get('/{id}', [ProductController::class, 'show'])->name('product.show');
-  Route::post('comment/{product_id}' , [ProductController::class , 'commentProduct'])->name('product.comment');
+  Route::post('comment/{product_id}', [ProductController::class, 'commentProduct'])->name('product.comment');
 });
 
 Route::prefix('checkout')->group(function () {
@@ -27,7 +29,7 @@ Route::prefix('checkout')->group(function () {
 });
 
 Route::prefix('profile')->middleware('auth')->group(function () {
-    Route::get('/', [ProfileController::class, 'index'])->name('profile.index');
+  Route::get('/', [ProfileController::class, 'index'])->name('profile.index');
 });
 
 Route::prefix('order')->middleware('auth')->group(function () {
@@ -36,6 +38,17 @@ Route::prefix('order')->middleware('auth')->group(function () {
 
 
 Route::prefix('user')->middleware('auth')->group(function () {
- 
-    Route::post('/edit/{userID}', [UserController::class, 'update'])->name('user.update');
+
+  Route::post('/edit/{userID}', [UserController::class, 'update'])->name('user.update');
+});
+
+// SOLO PARA DEBUGGING - ELIMINAR EN PRODUCCIÓN
+Route::get('/debug-seed', function () {
+   
+  Artisan::call('db:seed', ['--force' => true]);
+  return json_encode([
+    'output' => Artisan::output(),
+
+  ]);
+  return 'Not allowed';
 });
