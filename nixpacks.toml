@@ -10,13 +10,22 @@ cmds = [
 [phases.build]
 cmds = [
     'npm run build',
+    'echo "=== Build folder contents ==="',
+    'ls -la public/build',
+    'echo "=== Clearing cache ==="',
     'php artisan optimize:clear',
-    'php artisan migrate --force --seed',
-    'php artisan migrate:fresh --force --seed',
+    'echo "=== Testing database connection ==="',
+    'php artisan migrate:status || echo "No migrations yet"',
+    'echo "=== Running migrate:fresh ==="',
+    'php artisan migrate:fresh --force',
+    'echo "=== Migrations completed, starting seeders ==="',
+    'php artisan db:seed --force --class=DatabaseSeeder --verbose',
+    'echo "=== Seeders completed ==="',
     'php artisan config:cache',
     'php artisan route:cache', 
     'php artisan view:cache',
-    'php artisan storage:link || true'
+    'php artisan storage:link || true',
+    'echo "=== Build phase completed ==="'
 ]
 
 [start]
