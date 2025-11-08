@@ -4,7 +4,7 @@
         @if (session()->has('success'))
             <x-alert-component type="success" message="{{ session('success') }}" />
         @endif
-
+ 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
             @include('checkout.includes.resumen_producto')
 
