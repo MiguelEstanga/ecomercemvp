@@ -1,28 +1,17 @@
 @props(['producto'])
 
-@php
-    // Si el producto es un modelo y tiene imágenes
-    $imagen = null;
-    if (is_object($producto) && method_exists($producto, 'product_imagens')) {
-        $imagen =
-            $producto->product_imagens->where('is_main', true)->first()->path ??
-            ($producto->product_imagens->first()->path ?? null);
-    } elseif (is_array($producto) && isset($producto['image'])) {
-        // Si pasamos un array de prueba con clave 'image'
-        $imagen = $producto['image'];
-    }
-@endphp
+ 
 
 <div
     class="max-w-sm  cursor-pointer   rounded-2xl   overflow-hidden hover:shadow-xl transition transform hover:-translate-y-1">
     <!-- Imagen -->
     <div class="relative h-70 bg-gray-600">
-        @if ($imagen)
-            <img src="{{ asset($imagen) }}" alt="{{ $producto['name'] ?? $producto->name }}"
+        @if (!empty($product->product_imagens) && count($product->product_imagens) > 0)
+            <img src="{{ $product->product_imagens[0]->path ?? '' }}" alt="{{ $product->product_imagens[0]->path ?? '' }}"
                 class="w-full h-full object-cover">
         @else
             <div class="h-full flex items-center justify-center text-gray-400 text-sm">
-                Sin Imagen
+               
             </div>
         @endif
 
