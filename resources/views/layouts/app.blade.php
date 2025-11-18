@@ -18,38 +18,36 @@
     </style>
 </head>
 
-<body class="bg-gray-900 text-gray-100 antialiased">
+<body class="color_fondo">
 
     <div class="flex-wrapper">
-
-
-        <header class="bg-gray-800 shadow-md sticky top-0 z-50">
-            <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <header class="bg-white sticky top-0 z-50 shadow-xl">
+            <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ">
                 <div class="flex justify-between items-center h-16">
 
                     {{-- Logo y Nombre --}}
                     <a href="{{ route('home') }}">
                         <div class="flex-shrink-0 flex items-center">
-                            <span class="text-2xl font-bold text-indigo-400">MiApp</span>
+                            <span class="text-2xl font-bold text-indigo">Cytotecfemvenezuela</span>
                         </div>
                     </a>
 
                     {{-- Buscador (Centrado y funcionalmente simple) --}}
                     <div class="hidden sm:block">
-                        <input type="search" placeholder="Buscar..."
-                            class="py-2 px-4 w-96 bg-gray-700 border border-gray-600 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder-gray-400 text-gray-100">
+                        <input id="search-input" type="search" placeholder="Buscar..."
+                            class="py-2 px-4 w-96 bg-white-700 border border-gray-600 rounded-full   focus:outline-none  placeholder-black text-sky">
                     </div>
 
                     {{-- Menú de Usuario --}}
                     <div class="flex items-center space-x-4">
                         @auth {{-- Solo si el usuario ha iniciado sesión --}}
                             <a href="{{ route('profile.index') }}"
-                                class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition duration-150 ease-in-out">
+                                class="text-sky hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition duration-150 ease-in-out">
                                 Perfil
                             </a>
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
-                                <button type="submit" class="text-sm text-gray-300 hover:text-indigo-400">
+                                <button type="submit" class="text-sm text-sky hover:text-indigo-400">
                                     Salir
                                 </button>
                             </form>
@@ -72,9 +70,9 @@
         </main>
 
 
-        <footer class="bg-gray-800 mt-10">
+        <footer class="bg-white mt-10">
             <div
-                class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 text-center text-sm text-gray-500 border-t border-gray-700">
+                class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 text-center text-sm text-gray-500   border-gray-700">
                 <p>&copy; {{ date('Y') }} Mi Aplicación. Todos los derechos reservados.</p>
                 <div class="mt-2 space-x-4">
                     <a href="#" class="hover:text-gray-300 transition duration-150">Privacidad</a>
@@ -85,6 +83,13 @@
         </footer>
 
     </div>
+    @stack('scripts')
+      {{-- Livewire Scripts --}}
+    @livewireScripts
+    
+    {{-- Scripts adicionales --}}
+    @stack('scripts')
 </body>
+
 
 </html>

@@ -13,6 +13,11 @@ class OrderController extends Controller
         private OrderServices $orderService
     ) {}
 
+    public function index()
+    {
+         
+        return view('admin.order.index');
+    }
     /**
      * Mostrar detalle de una orden
      */

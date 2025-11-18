@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -14,25 +13,39 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::create([
-            'name' => 'Admin User',
-            'email' => 'admin@tienda.com',
-            'password' => Hash::make('password'), // Recuerda cambiar esto en producción
-            // Puedes añadir un campo 'role' si lo tienes: 'role' => 'admin'
+        // 1. EJECUTAR LOS ROLES Y PERMISOS PRIMERO
+        // Los roles deben existir en la BD antes de que puedas asignarlos a un usuario.
+        $this->call([
+            RolesAndPermissionsSeeder::class, // <-- ¡MOVEMOS ESTE SEEDER ARRIBA!
         ]);
 
+        // --- CREACIÓN Y ASIGNACIÓN DE USUARIOS CON ROLES ---
+
+        // 1. Usuario SuperAdmin (Ejemplo: "administrador" o "superadmin")
+        $adminUser = User::create([
+            'name' => 'Admin User',
+            'email' => 'admin@tienda.com',
+            'password' => Hash::make('password'),
+        ]);
+        // ASIGNACIÓN DE ROL:
+        $adminUser->assignRole('administrador'); // O 'superadmin', según cómo lo creaste en el seeder
+
         // 2. Usuario Cliente
-        User::create([
+        $clientUser = User::create([
             'name' => 'Cliente de Prueba',
             'email' => 'cliente@tienda.com',
             'password' => Hash::make('password'),
         ]);
+        // ASIGNACIÓN DE ROL:
+        $clientUser->assignRole('cliente');
 
         // 3. (Opcional) Usar Faker para crear 10 usuarios aleatorios
-        User::factory()->count(10)->create();
+        // A estos usuarios les podemos asignar el rol 'cliente' por defecto:
+        User::factory()->count(10)->create()->each(function ($user) {
+             $user->assignRole('cliente');
+        });
 
+        // --- LLAMADAS A OTROS SEEDERS (Que ya no dependen de los Roles) ---
         $this->call([
             PaymentMethodSeeder::class,
             PickupAgencySeeder::class,

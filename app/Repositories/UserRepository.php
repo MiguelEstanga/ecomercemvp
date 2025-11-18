@@ -3,8 +3,11 @@
 namespace App\Repositories;
 
 use App\Models\User;
+use App\Models\Profile;
 use App\Repositories\Contracts\UserRepositoryInterface;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Hash;
 
 // Implementa la interfaz que definimos
 class UserRepository implements UserRepositoryInterface
@@ -16,7 +19,15 @@ class UserRepository implements UserRepositoryInterface
     {
         $this->model = $model;
     }
-
+    public function create($data)
+    {
+        $user = new User();
+        $user->name = $data['name'];
+        $user->email = $data['email'];
+        $user->password = Hash::make($data['password']);
+        $user->save();
+        return $user;
+    }
     // ------------------------------------------------------------------
     // Métodos CRUD básicos
     // ------------------------------------------------------------------
@@ -64,5 +75,45 @@ class UserRepository implements UserRepositoryInterface
     {
         $user->update($data);
         return $user->fresh(); // Refresca desde la BD
+    }
+
+    public function updateProfile(User $user, array $data): Profile
+    {
+        Log::info('Update profile', ['data' => $data, 'user_id' => $user->id]);
+        $profile = Profile::where('user_id', $user->id)->first();
+        // Si no tiene perfil, crearlo
+        if (!isset($profile)) {
+            $profile = Profile::create([
+                'user_id' => $user->id,
+                'phone' => $data['phone'] ?? null,
+                'country' => $data['country'] ?? null,
+                'city' => $data['city'] ?? null,
+                'address' => $data['address'] ?? null,
+                'dni' => $data['dni'] ?? null,
+                'avatar' => $data['avatar'] ?? null,
+            ]);
+
+            return $profile;
+        }
+
+        // Si ya tiene perfil, actualizarlo
+
+        $profile->phone = $data['phone'] ?? null;
+        $profile->country = $data['country'] ?? null;
+        $profile->city = $data['city'] ?? null;
+        $profile->address = $data['address'] ?? null;
+        $profile->dni = $data['dni'] ?? null;
+        if (isset($data['avatar'])) {
+            $profile->avatar = $data['avatar'];
+        }
+        $profile->save();
+
+        return $profile->fresh(); // Refrescar desde la BD
+    }
+
+    public function getProfile(User $user): ?Profile
+    {
+        $profile = Profile::where('user_id', $user->id)->first();
+        return  $profile;
     }
 }

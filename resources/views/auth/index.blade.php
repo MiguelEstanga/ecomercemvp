@@ -11,16 +11,16 @@
 
 </head>
 
-<body class="bg-gray-900 min-h-screen flex items-center justify-center antialiased">
+<body class="bg-white min-h-screen flex items-center justify-center antialiased">
 
     {{-- Tarjeta de Login (bg-gray-800 para contraste) --}}
-    <div class="max-w-md w-full p-8 space-y-8 bg-gray-800 rounded-xl shadow-2xl z-10">
+    <div class="max-w-md w-full p-8 space-y-8 bg-gray-800 rounded-xl shadow-2xl z-10 bg-white">
 
         <div class="text-center">
-            <h2 class="mt-6 text-3xl font-extrabold text-gray-100">
+            <h2 class="mt-6 text-3xl font-extrabold text-black">
                 Acceso a la Plataforma
             </h2>
-            <p class="mt-2 text-sm text-gray-400">
+            <p class="mt-2 text-sm text-black">
                 Usa tu cuenta para continuar
             </p>
         </div>
@@ -63,9 +63,14 @@
                     </label>
                 </div>
 
-                <div class="text-sm">
+                {{-- <div class="text-sm">
                     <a href="#" class="font-medium text-indigo-400 hover:text-indigo-300">
                         ¿Olvidaste tu contraseña?
+                    </a>
+                </div> --}}
+                <div class="text-sm">
+                    <a href="{{ route('register') }}" class="font-medium text-indigo-400 hover:text-indigo-300">
+                        Crear una cuenta
                     </a>
                 </div>
             </div>

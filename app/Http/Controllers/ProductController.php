@@ -7,15 +7,23 @@ use App\services\ProductServices;
 use Illuminate\Support\Facades\Log;
 use App\services\CommentServices;
 use Illuminate\Support\Facades\Auth;
+use App\services\FileService;
+use App\Models\ProductImagen;
+use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
     private $productServices;
     private $commentService;
-    public function __construct(ProductServices $productServices, CommentServices $commentService)
-    {
+    private $fileService;
+    public function __construct(
+        ProductServices $productServices,
+        CommentServices $commentService,
+        FileService $fileService
+    ) {
         $this->productServices = $productServices;
         $this->commentService = $commentService;
+        $this->fileService = $fileService;
     }
 
     public function show($id)
@@ -23,22 +31,23 @@ class ProductController extends Controller
         try {
             $product = $this->productServices->findId($id);
             $comment = $this->commentService->findAll($id);
-            
-            return view('product.show', 
-            [
-                'product' => $product,  
-                'product_id' => $id,
-                'comment' => $comment
-            ]);
+
+            return view(
+                'product.show',
+                [
+                    'product' => $product,
+                    'product_id' => $id,
+                    'comment' => $comment
+                ]
+            );
         } catch (\Exception $e) {
             Log::error('Error al obtener el producto: ' . $e->getMessage());
         }
     }
 
-  
+
 
     // Asume que tienes el CommentService inyectado en el constructor
-    // ...
 
     public function commentProduct(Request $request, $product_id)
     {
@@ -76,6 +85,36 @@ class ProductController extends Controller
 
             // Devolver una respuesta de error al usuario
             return back()->with('error', 'Ocurrió un error inesperado al intentar publicar tu comentario. Por favor, inténtalo de nuevo.');
+        }
+    }
+
+    public function create(Request $request)
+    {
+        DB::beginTransaction();
+        $path = null;
+        if ($request->hasFile('imagen')) {
+            $path = $this->fileService->upload($request->file('imagen'), 'product', 'public');
+        }
+        try {
+
+
+            $producto = $this->productServices->create($request);
+
+            ProductImagen::create([
+                'product_id' => $producto->id,
+                'path' => $path,
+                'is_main' => true
+            ]);
+            DB::commit();
+            return back()->with('success', 'Producto creado correctamente');
+        } catch (\Exception $e) {
+
+            Log::error('Error al crear producto: ' . $e->getMessage());
+            DB::rollBack();
+            if ($request->hasFile('imagen')) {
+                $this->fileService->delete($path);
+            }
+            return response()->json(['message' => 'Error al crear producto'], 500);
         }
     }
 }

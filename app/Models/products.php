@@ -14,7 +14,7 @@ class products extends Model
         'price',    
         'price',
         'stok',
-        'is_active',
+        'active',
     ];
 
     public function product_imagens()

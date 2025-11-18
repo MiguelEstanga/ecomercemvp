@@ -6,11 +6,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-
+use Spatie\Permission\Traits\HasRoles;
+ 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasRoles;
 
     /**
      * The attributes that are mass assignable.
@@ -21,6 +22,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'active'
     ];
 
     /**
@@ -49,5 +51,23 @@ class User extends Authenticatable
     public function orders()
     {
         return $this->hasMany(Orders::class);
+    }
+
+    public function profile()
+    {
+        return $this->belongsTo(Profile::class, 'user_id');
+    }
+
+    public function getAvatarUrlAttribute()
+    {
+        
+        if ($this->profile && $this->profile->avatar) {
+            $cleanPath =  str_replace('public/', '', $this->profile->avatar);
+            $path = asset('storage/' . $cleanPath);
+            return $path;
+        }
+
+        // Avatar por defecto con iniciales
+        return 'https://ui-avatars.com/api/?name=' . urlencode($this->name) . '&color=7F9CF5&background=EBF4FF';
     }
 }

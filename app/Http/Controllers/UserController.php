@@ -14,6 +14,14 @@ class UserController extends Controller
     {
         $this->userServices = $userServices;
     }
+    public function index()
+    {
+        try{ 
+            return  view('admin.users.index');
+        }catch(\Exception $e){
+            return response()->json(['error' => $e->getMessage()], 401);
+        }
+    }
     public function update(Request $request  , $userId)
     {
        try{

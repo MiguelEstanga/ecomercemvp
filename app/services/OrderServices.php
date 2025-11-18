@@ -126,13 +126,34 @@ class OrderServices
   /**
    * Obtener orden por ID verificando permisos
    */
-  public function getOrderForUser(int $orderId, int $id  )
+  public function getOrderForUser(int $orderId, int $id)
   {
-     $userId = $id;
-    $order = $this->orderRepository->findById($orderId);
+    $userId = $id;
+    $relation = [
+      'user',
+      'items.product.product_imagens',
+      'paymentMethod',
+      'pickupAgency'
+    ];
+    $order = $this->orderRepository->findById($orderId , $relation);
     if (!$order || $order->user_id !== $userId) {
       return null;
     }
     return $order;
+  }
+
+  public function changeStatus($orderId, $newStatus)
+  {
+    return $this->orderRepository->updateStatus($orderId, $newStatus);
+  }
+
+  public function delete($orderId)
+  {
+    return $this->orderRepository->delete($orderId);
+  }
+
+  public function getOrderStats($filters)
+  {
+    return $this->orderRepository->getOrderStats($filters);
   }
 }

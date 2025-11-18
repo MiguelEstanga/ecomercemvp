@@ -18,7 +18,7 @@ class ProductRepository implements ProductRepositoryInterface
 
   public function all(): array|null
   {
-    $products = $this->model->with('product_imagens')->get();
+    $products = $this->model->where('active' , true)->with('product_imagens')->get();
     return $products->toArray();
   }
 
@@ -44,5 +44,45 @@ class ProductRepository implements ProductRepositoryInterface
     return $products;
   }
 
+  public function buscarPorNombre($nombre)
+  {
+    return $this->model->where('name', "like", "%{$nombre}%")->get();
+  }
+
+  public function create($data):Product
+  {
+    $product = new Product();
+    $product->name = $data['name'];
+    $product->slug = $data['slug'];
+    $product->description = $data['description'];
+    $product->price = $data['price'];
+    $product->stock = $data['stock'];
+    
+    $product->save();
+
+    return $product;
+  }
+
+  public function update($product_id, $data):Product
+  {
+    $product = $this->model->find($product_id);
+    $product->name = $data['name'];
+    $product->slug = $data['slug'];
+    $product->description = $data['description'];
+    $product->price = $data['price'];
+    $product->stock = $data['stock'];
+    $product->is_active = $data['is_active'];
+    
+    $product->save();
+
+    return $product;
+  }
+
+  public function delete($product_id):Product
+  {
+    $product = $this->model->find($product_id);
+    $product->delete();
+    return $product;
+  }
   
 }

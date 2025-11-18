@@ -5,6 +5,7 @@
     'closeButton' => true,
     'backdrop' => false,
     'footerClass' => 'justify-end',
+    'show' => false, // Nueva prop para controlar si inicia abierto
 ])
 
 @php
@@ -23,7 +24,7 @@
 <!-- Modal Backdrop -->
 <div id="{{ $name }}" 
     style="background-color: rgba(0, 0, 0, 0.5);"
-     class="fixed inset-0 z-50 hidden overflow-y-auto"
+     class="fixed inset-0 z-50 {{ $show ? '' : 'hidden' }} overflow-y-auto"
      aria-labelledby="{{ $name }}-title" 
      role="dialog" 
      aria-modal="true">
@@ -31,8 +32,7 @@
     <!-- Backdrop -->
     @if($backdrop)
     <div 
-
-        class="fixed inset-0 bg-black   transition-opacity"
+        class="fixed inset-0 bg-black transition-opacity"
          onclick="closeModal('{{ $name }}')"></div>
     @endif
     
@@ -77,6 +77,13 @@
         </div>
     </div>
 </div>
+
+@if($show)
+<script>
+    // Si el modal debe mostrarse al cargar, bloquear scroll
+    document.body.style.overflow = 'hidden';
+</script>
+@endif
 
 <script>
     // Funciones globales para manejar modales

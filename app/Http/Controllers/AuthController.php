@@ -7,6 +7,7 @@ use App\services\AuthServices;
 use \Exception; // Para capturar errores genéricos
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 class AuthController extends Controller
 {
     protected $authService;
@@ -33,13 +34,41 @@ class AuthController extends Controller
         }
     }
 
-    public function logout(Request $request)
+    public function logout()
     {
         Auth::logout();
         return redirect()->route('login');
     }
 
-    public function loginView(){
+    public function loginView()
+    {
         return view('auth.index');
+    }
+
+    public function registerView()
+    {
+        return view('auth.create');
+    }
+
+    public function register(Request $request)
+    {
+
+        try {
+            $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => 'required|string|email|max:255|unique:users',
+                'password' => 'required|string|min:8|confirmed',
+                'password_confirmation' => 'required|same:password',
+            ]);
+
+
+            $user =  $this->authService->register($request->all());
+            Auth::attempt(['email' => $user ->email, 'password' => Hash::make($request->password)]);
+            
+             return response()->redirectTo('/'); 
+        } catch (\Exception $e) {
+            Log::error('Error al crear el usuario: ' . $e->getMessage());
+            return redirect()->back()->with('message', $e->getMessage());
+        }
     }
 }

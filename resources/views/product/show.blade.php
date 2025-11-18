@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('title', $product->name)
 @section('content')
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-white mt-4">
 
         {{-- Breadcrumb --}}
         <nav class="mb-6 text-sm">
@@ -19,7 +19,7 @@
             {{-- Galería de Imágenes --}}
             <div class="space-y-4">
                 {{-- Imagen Principal --}}
-                <div class="bg-gray-100 rounded-lg overflow-hidden aspect-square">
+                <div class="bg-black rounded-lg overflow-hidden aspect-square">
                     @if (!empty($product->product_imagens) && count($product->product_imagens) > 0)
                         <img id="mainImage" src="{{ $product->product_imagens[0]->path ?? '' }}" alt="{{ $product->name }}"
                             class="w-full h-full object-cover">
@@ -54,7 +54,7 @@
                 {{-- Título y Estado --}}
                 <div>
                     <div class="flex items-center gap-3 mb-2">
-                        <h1 class="text-3xl  font-bold text-white">{{ $product->name }}</h1>
+                        <h1 class="text-3xl  font-bold text-black">{{ $product->name }}</h1>
                         @if ($product->is_active)
                             <span class="bg-green-100 text-green-800 text-xs font-semibold px-3 py-1 rounded-full">
                                 Disponible
@@ -92,17 +92,13 @@
                     <p class="text-white-600 leading-relaxed">{{ $product->description }}</p>
                 </div>
 
-                {{-- Stock --}}
-                <div class="bg-sky-500/75 rounded-lg p-4">
-                    <div class="flex items-center justify-between">
-                        <span class="text-white-700 font-medium">Stock disponible:</span>
-                        <span
-                            class="text-lg font-bold {{ $product->stock > 10 ? 'text-white-600' : ($product->stock > 0 ? 'text-orange-600' : 'text-red-600') }}">
-                            {{ $product->stock }} unidades
-                        </span>
-                    </div>
-                </div>
+                <div class="flex items-center justify-between">
 
+                    <span
+                        class="text-lg font-bold {{ $product->stock > 10 ? 'text-white-600' : ($product->stock > 0 ? 'text-orange-600' : 'text-red-600') }}">
+                        Quedan {{ $product->stock }} unidades
+                    </span>
+                </div>
                 {{-- Cantidad y Botón de Compra --}}
                 <form action="{{ route('checkout.index', $product->id) }}">
                     @csrf
@@ -135,14 +131,6 @@
                                     </path>
                                 </svg>
                                 Comprar
-                            </button>
-                            <button type="button"
-                                class="bg-gray-200 hover:bg-gray-300 text-gray-700 p-4 rounded-lg transition-colors">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z">
-                                    </path>
-                                </svg>
                             </button>
                         @else
                             <button type="button" disabled
@@ -181,31 +169,17 @@
 
         {{-- Sección de Comentarios y Reseñas --}}
         <div class="max-w-4xl mx-auto">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6">Reseñas de Clientes</h2>
+            <h2 class="text-2xl font-bold text-black mb-6">Reseñas de Clientes</h2>
 
             {{-- Formulario de Comentario --}}
             @auth
-                <div class=" dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
+                <div class="   rounded-lg  p-6 mb-6">
                     <h3 class="text-lg font-semibold mb-4">Escribe tu reseña</h3>
-                    <form action="{{ route('product.comment' , $product_id ) }}" method="POST">
+                    <form action="{{ route('product.comment', $product_id) }}" method="POST">
                         @csrf
 
                         {{-- Rating --}}
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-whitte mb-2">Calificación</label>
-                            <div class="flex gap-2" id="rating-stars">
-                                @for ($i = 1; $i <= 5; $i++)
-                                    <button type="button" onclick="setRating({{ $i }})"
-                                        class="text-gray-300 hover:text-yellow-400 transition-colors">
-                                        <svg class="w-8 h-8 fill-current" viewBox="0 0 20 20">
-                                            <path
-                                                d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
-                                        </svg>
-                                    </button>
-                                @endfor
-                            </div>
-                            <input type="hidden" name="rating" id="rating-input" value="5">
-                        </div>
+                       
 
                         {{-- Comentario --}}
                         <div class="mb-4">
@@ -234,7 +208,7 @@
             <div class="space-y-4">
                 {{-- Ejemplo de comentario (repite esto con @foreach para comentarios reales) --}}
                 @forelse($comment ?? [] as $review)
-                    <div class="bg-gray-800 rounded-lg shadow-md p-6">
+                    <div class=" rounded-lg shadow-md p-6">
                         <div class="flex items-start justify-between mb-3">
                             <div class="flex items-center gap-3">
                                 <div
@@ -262,7 +236,7 @@
                         <p class="text-whitte leading-relaxed">{{ $review->content }}</p>
                     </div>
                 @empty
-                    <div class="bg-gray-800 rounded-lg p-8 text-center">
+                    <div class=" rounded-lg p-8 text-center">
                         <svg class="w-16 h-16 text-whitte mx-auto mb-3" fill="none" stroke="currentColor"
                             viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

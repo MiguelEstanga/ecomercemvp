@@ -118,13 +118,56 @@ class OrderRpository
   }
 
   /**
-     * Obtener órdenes paginadas por usuario
-     */
-    public function paginateByUser(int $userId, int $perPage = 10) 
-    {
-        return $this->order->where('user_id', $userId)
-            ->with(['items.product'])
-            ->orderBy('created_at', 'desc')
-            ->paginate($perPage);
+   * Obtener órdenes paginadas por usuario
+   */
+  public function paginateByUser(int $userId, int $perPage = 10)
+  {
+    return $this->order->where('user_id', $userId)
+      ->with(['items.product'])
+      ->orderBy('created_at', 'desc')
+      ->paginate($perPage);
+  }
+
+
+  public function updateStatus($oriderID, $newStatus): ?Orders
+  {
+    $order = $this->order->find($oriderID);
+    if ($order) {
+      $order->status = $newStatus;
+      $order->save();
+      return $order;
     }
+    return null;
+  }
+
+  public function delete($id)
+  {
+    $order = $this->order->find($id);
+    if ($order) {
+      $order->delete();
+      return true;
+    }
+    return false;
+  }
+
+  public function getOrderStats(array $filters = [])
+  {
+    $query = Orders::query();
+
+    // Aplicar filtros de fecha si existen
+    if (!empty($filters['date_from'])) {
+      $query->whereDate('created_at', '>=', $filters['date_from']);
+    }
+
+    if (!empty($filters['date_to'])) {
+      $query->whereDate('created_at', '<=', $filters['date_to']);
+    }
+
+    return [
+      'total' => $query->count(),
+      'pending' => (clone $query)->where('status', 'pending')->count(),
+      'completed' => (clone $query)->where('status', 'delivered')->count(),
+       
+    ];
+  }
 }

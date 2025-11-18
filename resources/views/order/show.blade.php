@@ -1,5 +1,7 @@
 @extends('layouts.app')
+
 @section('title', 'Detalle de Orden')
+
 @section('content')
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <!-- Encabezado -->
@@ -10,7 +12,7 @@
                 </svg>
                 Volver a Órdenes
             </a>
-            <h1 class="text-3xl font-bold text-gray-900">Orden #{{ $order->id }}</h1>
+            <h1 class="text-3xl font-bold text-gray-900">Orden #{{ $order->order_number }}</h1>
             <p class="text-gray-500 mt-1">Realizada el {{ $order->created_at->format('d/m/Y H:i') }}</p>
         </div>
 
@@ -22,18 +24,41 @@
                     <div class="flex justify-between items-start mb-6">
                         <div>
                             <h2 class="text-xl font-semibold text-gray-900 mb-2">Estado de la Orden</h2>
-                            <span class="px-4 py-2 text-sm font-semibold rounded-full inline-block
-                                @if($order->status === 'pending') bg-yellow-100 text-yellow-800
-                                @elseif($order->status === 'processing') bg-blue-100 text-blue-800
-                                @elseif($order->status === 'completed') bg-green-100 text-green-800
-                                @elseif($order->status === 'cancelled') bg-red-100 text-red-800
-                                @endif">
-                                {{ ucfirst($order->status) }}
-                            </span>
+                            @switch($order->status)
+                                @case('pending')
+                                    <span class="px-4 py-2 text-sm font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                        🟡 Pendiente
+                                    </span>
+                                    @break
+                                @case('processing')
+                                    <span class="px-4 py-2 text-sm font-semibold rounded-full bg-blue-100 text-blue-800">
+                                        🔵 Procesando
+                                    </span>
+                                    @break
+                                @case('shipped')
+                                    <span class="px-4 py-2 text-sm font-semibold rounded-full bg-purple-100 text-purple-800">
+                                        🟣 Enviado
+                                    </span>
+                                    @break
+                                @case('completed')
+                                    <span class="px-4 py-2 text-sm font-semibold rounded-full bg-green-100 text-green-800">
+                                        🟢 Completado
+                                    </span>
+                                    @break
+                                @case('cancelled')
+                                    <span class="px-4 py-2 text-sm font-semibold rounded-full bg-red-100 text-red-800">
+                                        🔴 Cancelado
+                                    </span>
+                                    @break
+                                @default
+                                    <span class="px-4 py-2 text-sm font-semibold rounded-full bg-gray-100 text-gray-800">
+                                        {{ ucfirst($order->status) }}
+                                    </span>
+                            @endswitch
                         </div>
                         <div class="text-right">
                             <p class="text-sm text-gray-500">Total</p>
-                            <p class="text-2xl font-bold text-gray-900">${{ number_format($order->total, 2) }}</p>
+                            <p class="text-2xl font-bold text-gray-900">${{ number_format($order->total_amount, 2) }}</p>
                         </div>
                     </div>
 
@@ -42,12 +67,14 @@
                         <div class="flex justify-between mb-2">
                             <span class="text-xs font-medium text-gray-600">Pendiente</span>
                             <span class="text-xs font-medium text-gray-600">Procesando</span>
-                            <span class="text-xs font-medium text-gray-600">Completada</span>
+                            <span class="text-xs font-medium text-gray-600">Enviado</span>
+                            <span class="text-xs font-medium text-gray-600">Completado</span>
                         </div>
                         <div class="overflow-hidden h-2 text-xs flex rounded bg-gray-200">
-                            <div class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center
-                                @if($order->status === 'pending') w-1/3 bg-yellow-500
-                                @elseif($order->status === 'processing') w-2/3 bg-blue-500
+                            <div class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center transition-all duration-500
+                                @if($order->status === 'pending') w-1/4 bg-yellow-500
+                                @elseif($order->status === 'processing') w-1/2 bg-blue-500
+                                @elseif($order->status === 'shipped') w-3/4 bg-purple-500
                                 @elseif($order->status === 'completed') w-full bg-green-500
                                 @endif">
                             </div>
@@ -61,8 +88,11 @@
                     <div class="space-y-4">
                         @foreach($order->items as $item)
                             <div class="flex items-center border-b border-gray-200 pb-4 last:border-0 last:pb-0">
-                                @if($item->product->image)
-                                    <img src="{{ asset('storage/' . $item->product->image) }}" 
+                                @if($item->product && $item->product->product_imagens->count() > 0)
+                                    @php
+                                        $cleanPath = str_replace('public/', '', $item->product->product_imagens[0]->path);
+                                    @endphp
+                                    <img src="/storage/{{ $cleanPath }}" 
                                          alt="{{ $item->product->name }}"
                                          class="w-20 h-20 object-cover rounded-lg">
                                 @else
@@ -73,16 +103,18 @@
                                     </div>
                                 @endif
                                 <div class="ml-4 flex-1">
-                                    <h3 class="text-lg font-medium text-gray-900">{{ $item->product->name }}</h3>
-                                    <p class="text-sm text-gray-500 mt-1">{{ $item->product->description }}</p>
+                                    <h3 class="text-lg font-medium text-gray-900">{{ $item->product->name ?? $item->product_name }}</h3>
+                                    @if($item->product && $item->product->description)
+                                        <p class="text-sm text-gray-500 mt-1">{{ Str::limit($item->product->description, 100) }}</p>
+                                    @endif
                                     <div class="flex items-center mt-2">
                                         <span class="text-sm text-gray-500">Cantidad: {{ $item->quantity }}</span>
                                         <span class="mx-2 text-gray-300">|</span>
-                                        <span class="text-sm font-medium text-gray-900">${{ number_format($item->price, 2) }} c/u</span>
+                                        <span class="text-sm font-medium text-gray-900">${{ number_format($item->unit_price, 2) }} c/u</span>
                                     </div>
                                 </div>
                                 <div class="text-right">
-                                    <p class="text-lg font-bold text-gray-900">${{ number_format($item->price * $item->quantity, 2) }}</p>
+                                    <p class="text-lg font-bold text-gray-900">${{ number_format($item->unit_price * $item->quantity, 2) }}</p>
                                 </div>
                             </div>
                         @endforeach
@@ -92,108 +124,95 @@
                     <div class="mt-6 pt-6 border-t space-y-2">
                         <div class="flex justify-between text-sm">
                             <span class="text-gray-600">Subtotal</span>
-                            <span class="text-gray-900">${{ number_format($order->total / 1.16, 2) }}</span>
+                            <span class="text-gray-900">${{ number_format($order->total_amount / 1.16, 2) }}</span>
                         </div>
                         <div class="flex justify-between text-sm">
                             <span class="text-gray-600">IVA (16%)</span>
-                            <span class="text-gray-900">${{ number_format($order->total - ($order->total / 1.16), 2) }}</span>
+                            <span class="text-gray-900">${{ number_format($order->total_amount - ($order->total_amount / 1.16), 2) }}</span>
                         </div>
                         <div class="flex justify-between text-lg font-bold pt-2 border-t">
                             <span class="text-gray-900">Total</span>
-                            <span class="text-gray-900">${{ number_format($order->total, 2) }}</span>
+                            <span class="text-indigo-600">${{ number_format($order->total_amount, 2) }}</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Información de Envío -->
+                <!-- Información de Envío y Pago -->
                 <div class="bg-white rounded-lg shadow p-6">
-                    <h2 class="text-xl font-semibold text-gray-900 mb-4">Información de Envío</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-4">Información de Envío y Pago</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <p class="text-sm font-medium text-gray-500">Dirección</p>
-                            <p class="text-gray-900 mt-1">{{ $order->shipping_address ?? 'No especificada' }}</p>
+                            <p class="text-sm font-medium text-gray-500 mb-2">Dirección de Envío</p>
+                            <p class="text-gray-900">{{ $order->shipping_address ?? 'No especificada' }}</p>
+                            
+                            @if($order->pickupAgency)
+                                <div class="mt-3 p-3 bg-blue-50 rounded-lg">
+                                    <p class="text-sm font-medium text-blue-900">Agencia de Retiro</p>
+                                    <p class="text-sm text-blue-700 mt-1">{{ $order->pickupAgency->name }}</p>
+                                    <p class="text-xs text-blue-600 mt-1">{{ $order->pickupAgency->address }}</p>
+                                </div>
+                            @endif
                         </div>
                         <div>
-                            <p class="text-sm font-medium text-gray-500">Método de Pago</p>
-                            <p class="text-gray-900 mt-1">{{ $order->payment_method ?? 'Tarjeta de crédito' }}</p>
+                            <p class="text-sm font-medium text-gray-500 mb-2">Método de Pago</p>
+                            <p class="text-gray-900">{{ $order->paymentMethod->name ?? 'N/A' }}</p>
+                            
+                            @if($order->observaciones)
+                                <div class="mt-3">
+                                    <p class="text-sm font-medium text-gray-500">Observaciones</p>
+                                    <p class="text-sm text-gray-700 mt-1">{{ $order->observaciones }}</p>
+                                </div>
+                            @endif
                         </div>
                     </div>
+
+                    {{-- Documentos (si el usuario los subió) --}}
+                    @if($order->imagen_documento || $order->imagen_comprobante)
+                    <div class="mt-6 pt-6 border-t">
+                        <p class="text-sm font-medium text-gray-500 mb-3">Documentos Adjuntos</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            @if($order->imagen_documento)
+                                <div>
+                                    <p class="text-xs text-gray-500 mb-2">Documento</p>
+                                    <a href="/storage/{{ $order->imagen_documento }}" target="_blank" class="block">
+                                        <img src="/storage/{{ $order->imagen_documento }}" 
+                                             alt="Documento" 
+                                             class="w-full h-32 object-cover rounded-lg border-2 border-gray-200 hover:border-indigo-500 transition-colors">
+                                    </a>
+                                </div>
+                            @endif
+                            @if($order->imagen_comprobante)
+                                <div>
+                                    <p class="text-xs text-gray-500 mb-2">Comprobante de Pago</p>
+                                    <a href="/storage/{{ $order->imagen_comprobante }}" target="_blank" class="block">
+                                        <img src="/storage/{{ $order->imagen_comprobante }}" 
+                                             alt="Comprobante" 
+                                             class="w-full h-32 object-cover rounded-lg border-2 border-gray-200 hover:border-indigo-500 transition-colors">
+                                    </a>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                    @endif
                 </div>
             </div>
 
-            <!-- Chat de Soporte (Próximamente) -->
+            <!-- Chat de Soporte - NUEVO CON WEBSOCKET -->
             <div class="lg:col-span-1">
-                <div class="bg-white rounded-lg shadow sticky top-6">
-                    <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-                        <h2 class="text-lg font-semibold text-gray-900">Chat de Soporte</h2>
-                        <span class="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-600 rounded">Próximamente</span>
-                    </div>
-                    
-                    <!-- Área de mensajes -->
-                    <div class="h-96 p-6 overflow-y-auto bg-gray-50">
-                        <div class="flex flex-col items-center justify-center h-full text-center">
-                            <svg class="w-16 h-16 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-                            </svg>
-                            <p class="text-gray-500 text-sm">El chat de soporte estará disponible próximamente</p>
-                            <p class="text-gray-400 text-xs mt-2">Podrás comunicarte directamente con nuestro equipo</p>
-                        </div>
-
-                        <!-- Ejemplo de cómo se verán los mensajes -->
-                        <div class="hidden">
-                            <!-- Mensaje del soporte -->
-                            <div class="mb-4">
-                                <div class="flex items-start">
-                                    <div class="flex-shrink-0">
-                                        <div class="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center">
-                                            <span class="text-white text-xs font-medium">S</span>
-                                        </div>
-                                    </div>
-                                    <div class="ml-3 max-w-xs">
-                                        <div class="bg-white rounded-lg px-4 py-2 shadow-sm">
-                                            <p class="text-sm text-gray-900">¡Hola! ¿En qué puedo ayudarte con tu orden?</p>
-                                        </div>
-                                        <p class="text-xs text-gray-500 mt-1">10:30 AM</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Mensaje del usuario -->
-                            <div class="mb-4">
-                                <div class="flex items-start justify-end">
-                                    <div class="mr-3 max-w-xs">
-                                        <div class="bg-indigo-600 rounded-lg px-4 py-2 shadow-sm">
-                                            <p class="text-sm text-white">¿Cuándo llegará mi pedido?</p>
-                                        </div>
-                                        <p class="text-xs text-gray-500 mt-1 text-right">10:31 AM</p>
-                                    </div>
-                                    <div class="flex-shrink-0">
-                                        <div class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
-                                            <span class="text-gray-700 text-xs font-medium">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Input de mensaje (deshabilitado) -->
-                    <div class="p-4 border-t border-gray-200">
-                        <div class="flex space-x-2">
-                            <input type="text" 
-                                   placeholder="Escribe un mensaje..." 
-                                   disabled
-                                   class="flex-1 border border-gray-300 rounded-lg px-4 py-2 text-sm bg-gray-100 cursor-not-allowed">
-                            <button disabled class="bg-gray-300 text-gray-500 px-4 py-2 rounded-lg cursor-not-allowed">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
-                                </svg>
-                            </button>
-                        </div>
-                        <p class="text-xs text-gray-400 mt-2 text-center">Función en desarrollo</p>
-                    </div>
+                <div class="sticky top-6">
+                    <livewire:components.order-chat 
+                        :orderId="$order->id" 
+                        userType="customer"
+                    />
                 </div>
             </div>
         </div>
     </div>
 @endsection
+
+@push('scripts')
+    {{-- Script adicional si necesitas hacer algo más --}}
+    <script>
+        console.log('Vista de orden del cliente cargada');
+    </script>
+@endpush
