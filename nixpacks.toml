@@ -1,34 +1,22 @@
-# -------------------------------------------------------------------
-# Paquetes que Nix instalará en el build container
-# -------------------------------------------------------------------
-[nixpacks]
-packages = [
+[build]
+nixPkgs = [
   "php82",
   "php82Packages.composer",
   "php82Extensions.zip",
-  "php82Extensions.redis", # opcional si usas Redis
+  "php82Extensions.redis",
   "nodejs_20"
 ]
 
-# -------------------------------------------------------------------
-# Fase de instalación
-# -------------------------------------------------------------------
 [phases.install]
 cmds = [
   "composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction",
   "npm ci --production=false"
 ]
 
-# -------------------------------------------------------------------
-# Fase de build
-# -------------------------------------------------------------------
 [phases.build]
 cmds = [
   "npm run build"
 ]
 
-# -------------------------------------------------------------------
-# Comando de inicio
-# -------------------------------------------------------------------
 [start]
 cmd = "php artisan migrate --force && php artisan db:seed --force && php artisan optimize && php -S 0.0.0.0:$PORT -t public"
