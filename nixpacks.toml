@@ -6,7 +6,8 @@ nixPkgs = ['nodejs_20', 'php82', 'php82Packages.composer', 'php82Packages.php82E
 [phases.install]
 # Instalación de dependencias de PHP y JavaScript
 cmds = [
-    'composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction',
+    # AÑADIDO: --ignore-platform-reqs=ext-zip para ignorar temporalmente la falta de zip
+    'composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction --ignore-platform-reqs=ext-zip', 
     'npm ci --production=false'
 ]
 
