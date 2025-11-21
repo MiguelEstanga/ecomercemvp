@@ -11,7 +11,7 @@ class products extends Model
         'name',
         'slug',
         'description',
-        'price',    
+        'price',     
         'price',
         'stok',
         'active',
