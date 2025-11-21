@@ -13,3 +13,4 @@ RUN composer install --no-interaction --optimize-autoloader --no-dev --ignore-pl
 EXPOSE 8080
 
 CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8080"]
+ 
