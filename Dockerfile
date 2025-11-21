@@ -1,6 +1,7 @@
 # Usa una imagen base oficial de PHP
 FROM php:8.2-fpm-alpine
 
+# --- PASO DE INSTALACIÓN DE DEPENDENCIAS DEL SISTEMA ---
 # Instala las dependencias de Linux necesarias, incluyendo 'zip' y 'composer'
 RUN apk add --no-cache \
     git \
@@ -11,24 +12,22 @@ RUN apk add --no-cache \
     nodejs \
     npm 
 
-# Instala la extensión ZIP de PHP
+# ¡ESTO ES LO CRÍTICO! Instala y habilita la extensión ZIP de PHP
 RUN docker-php-ext-install zip
 
-# Establece el directorio de trabajo
+# Establece el directorio de trabajo y copia la aplicación
 WORKDIR /app
-
-# Copia los archivos de la aplicación
 COPY . /app
 
-# Instala las dependencias de PHP con Composer
+# --- PASO DE COMPOSER (AHORA LA EXTENSIÓN 'zip' ESTÁ DISPONIBLE) ---
+# Instala las dependencias de PHP
 RUN composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction
 
 # Instala y compila los assets de Node
 RUN npm ci --production=false
 RUN npm run build
 
-# El comando de inicio para la aplicación (usando el servidor integrado de PHP)
-# IMPORTANTE: Se han eliminado 'php artisan migrate' y 'php artisan optimize'.
-# La aplicación solo iniciará el servidor web.
-# Las operaciones de base de datos se harán manualmente.
+# --- COMANDO DE INICIO ---
+# El comando de inicio para servir la aplicación PHP.
+# NO incluye migraciones.
 CMD php -S 0.0.0.0:$PORT -t public
