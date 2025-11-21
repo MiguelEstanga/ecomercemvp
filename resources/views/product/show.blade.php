@@ -21,7 +21,10 @@
                 {{-- Imagen Principal --}}
                 <div class="bg-black rounded-lg overflow-hidden aspect-square">
                     @if (!empty($product->product_imagens) && count($product->product_imagens) > 0)
-                        <img id="mainImage" src="{{ $product->product_imagens[0]->path ?? '' }}" alt="{{ $product->name }}"
+                        @php
+                            $cleanPath = str_replace('public/', '', $product->product_imagens[0]->path);
+                        @endphp
+                        <img id="mainImage" src="/storage/{{ $cleanPath }}" alt="{{ $product->name }}"
                             class="w-full h-full object-cover">
                     @else
                         <div class="w-full h-full flex items-center justify-center">

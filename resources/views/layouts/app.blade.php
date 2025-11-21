@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Mi Aplicación')</title>
-
+    <link rel="icon" type="image/png" href="/icon.ico">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         /* CSS simple para asegurar que el footer se quede abajo */
@@ -74,11 +74,11 @@
             <div
                 class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 text-center text-sm text-gray-500   border-gray-700">
                 <p>&copy; {{ date('Y') }} Mi Aplicación. Todos los derechos reservados.</p>
-                <div class="mt-2 space-x-4">
+                {{-- <div class="mt-2 space-x-4">
                     <a href="#" class="hover:text-gray-300 transition duration-150">Privacidad</a>
                     <a href="#" class="hover:text-gray-300 transition duration-150">Términos</a>
                     <a href="#" class="hover:text-gray-300 transition duration-150">Contacto</a>
-                </div>
+                </div> --}}
             </div>
         </footer>
 

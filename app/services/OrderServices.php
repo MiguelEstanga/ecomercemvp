@@ -72,7 +72,7 @@ class OrderServices
         $metadata['total_amount'] = $product->price * $data['quantity'];
         $metadata['status'] = 'pending';
         $metadata['payment_method_id'] = $data['payment_method_id'];
-        $metadata['pickup_agency_id'] = $data['pickup_agency_id'];
+        $metadata['pickup_agency_id'] = 1;
         $metadata['shipping_address'] = $data['shipping_address'];
         $metadata['observaciones'] = "comprado";
         $metadata['phone_number'] = $data['phone_number'];

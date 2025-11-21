@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login Elegante | Tema Oscuro</title>
+    <link rel="icon" type="image/png" href="/icon.ico">
 
     {{-- La directiva @vite es esencial para cargar los estilos compilados de Tailwind --}}
     @vite(['resources/css/app.css', 'resources/js/app.js'])

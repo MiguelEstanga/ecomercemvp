@@ -21,4 +21,13 @@ class products extends Model
     {
         return $this->hasMany(ProductImagen::class, 'product_id', 'id');
     }
+
+    public function mainImage()
+    {   
+        if($this->product_imagens[0]->path === null){
+            return null;
+        }
+         $cleanPath = str_replace('public/', '', $this->product_imagens[0]->path);
+        return $cleanPath;
+    }
 }

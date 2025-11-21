@@ -38,8 +38,8 @@
 
                     <x-text-input name="phone_number" label="Numero de telefono" placeholder="04141234567" required />
 
-                    <x-select-input name="payment_method_id" label="Agencia de Retiro" :options="$agencies"
-                        placeholder="Agencia de Retiro" required />
+                    {{-- <x-select-input name="payment_method_id" label="Agencia de Retiro" :options="$agencies"
+                        placeholder="Agencia de Retiro" required /> --}}
 
                     <x-textarea-input name="shipping_address" label="Dirección de Envío"
                         placeholder="Ingresa tu dirección completa" rows="3" required />

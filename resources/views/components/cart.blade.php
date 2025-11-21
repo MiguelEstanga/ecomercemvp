@@ -15,16 +15,19 @@
         bg-white
     ">
 
-    <div class="relative h-70 bg-black">
-        @if (!empty($product->product_imagens) && count($product->product_imagens) > 0)
-            <img src="{{ $product->product_imagens[0]->path ?? '' }}" alt="{{ $product->name ?? '' }}"
-                class="w-full h-full object-cover">
+    <div class="relative h-70  ">
+
+        @if (  count($producto['product_imagens']) > 0)
+            @php
+            
+                $cleanPath = str_replace('public/', '', $producto['product_imagens'][0]['path']);
+            @endphp
+            <img src="/storage/{{ $cleanPath }}" alt="{{ $producto->mainImage ?? '' }}" class="w-full h-full object-cover">
         @else
             <div class="h-full flex items-center justify-center text-gray-400 text-sm">
 
             </div>
         @endif
-
         <!-- Badge -->
         @if (($producto['stock'] ?? $producto->stock) > 0)
             <span class="absolute top-2 right-2  text-black text-xs font-semibold px-2 py-1 rounded-full">

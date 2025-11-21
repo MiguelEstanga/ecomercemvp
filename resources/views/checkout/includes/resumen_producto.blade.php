@@ -1,17 +1,16 @@
   <!-- Resumen del Producto -->
-  <div class="bg-white rounded-lg shadow-sm p-6"  >
+  <div class="bg-white rounded-lg shadow-sm p-6">
       <h2 class="text-2xl font-semibold text-gray-800 mb-6">Resumen de Compra</h2>
 
       <div class="flex gap-4 pb-6 border-b border-gray-200">
           <!-- Imagen del Producto -->
           <div class="w-24 h-24 flex-shrink-0">
-              @if ($product->product_imagens && count($product->product_imagens) > 0)a
+              @if ($product->product_imagens && count($product->product_imagens) > 0)
+                 
                   @php
-                      $mainImage =
-                          collect($product->product_imagens)->firstWhere('is_main', true) ??
-                          $product->product_imagens[0];
+                      $cleanPath = str_replace('public/', '', $product->product_imagens[0]->path);
                   @endphp
-                  <img src="{{ $mainImage->path }}" alt="{{ $product->name }}"
+                  <img src="/storage/{{ $cleanPath }}" alt="{{ $product->name }}"
                       class="w-full h-full object-cover rounded-lg">
               @else
                   <div class="w-full h-full bg-gray-200 rounded-lg flex items-center justify-center">

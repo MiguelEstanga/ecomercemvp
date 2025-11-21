@@ -22,7 +22,7 @@ class AdminController extends Controller
     public function productos()
     {
         try {
-               $products = $this->productService->getAllProducts();
+            $products = $this->productService->getAllProducts();
             return view('admin.products.index', compact('products'));
         } catch (\Exception $e) {
             return response()->json(['message' => 'Internal Server Error'], 500);
@@ -33,4 +33,11 @@ class AdminController extends Controller
     {
         return view('admin.users.index');
     }
+
+    public function agencias()
+    {
+        return view('admin.pickup.index');
+    }
+
+    
 }

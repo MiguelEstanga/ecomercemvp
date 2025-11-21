@@ -64,6 +64,11 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
       
    });
 
+   Route::prefix("agencias")->group(function () {
+    Route::get('/', [AdminController::class, 'agencias'])->name('agency.admin.index');
+    
+  });
+
 
 });
 // SOLO PARA DEBUGGING - ELIMINAR EN PRODUCCIÓN

@@ -173,8 +173,11 @@
                                             @endphp
                                             <div class="flex items-center justify-between py-2">
                                                 <div class="flex items-center space-x-3">
+                                                    @php
+                                                        $cleanPath = str_replace('public/', '', $item->product->product_imagens[0]->path);
+                                                    @endphp
                                                     <img width="74" height="74" style="border-radius: 5px"
-                                                        src="{{ asset('storage/' . $item->product->image) }}"
+                                                        src="/storage/{{ $cleanPath }}"
                                                         class="bg-black">
 
                                                     <div>
@@ -221,7 +224,7 @@
         <x-modal name="editarPerfil2" title="Completa tu perfil" size="md">
             @php
                 // Quitar 'public/' de la ruta
-                $cleanPath = str_replace('public/', '', $profile->avatar);
+                $cleanPath = str_replace('public/', '', $profile->avatar ?? "");
                 $path = asset('storage/' . $cleanPath);
             @endphp
             <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data">
