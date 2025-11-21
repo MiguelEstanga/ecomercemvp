@@ -1,6 +1,4 @@
-[phases.setup]
 nixPkgs = ['nodejs_20', 'php82', 'php82Packages.composer']
-aptPkgs = ['php-cli', 'php-gd', 'php-intl', 'php-pgsql', 'php-mbstring', 'php-zip']
 
 [phases.install]
 cmds = [
@@ -10,10 +8,8 @@ cmds = [
 
 [phases.build]
 cmds = [
-    'npm run build',
-    'mkdir -p storage/framework/{sessions,views,cache} storage/logs bootstrap/cache',
-    'chmod -R 775 storage bootstrap/cache'
+    'npm run build'
 ]
 
 [start]
-cmd = 'php artisan migrate:fresh --force && php artisan db:seed --force && php artisan optimize && php -S 0.0.0.0:$PORT -t public'
+cmd = 'php artisan migrate --force && php artisan db:seed --force && php artisan optimize && php -S 0.0.0.0:$PORT -t public'
