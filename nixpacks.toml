@@ -1,21 +1,34 @@
-[build]
-nixPkgs = [
-  "php82",
-  "php82Packages.composer",
-  "php82Extensions.zip",
-  "nodejs_20"
-]
+# Usa una imagen base oficial de PHP
+FROM php:8.2-fpm-alpine
 
-[phases.install]
-cmds = [
-  "composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction",
-  "npm ci --production=false"
-]
+# Instala las dependencias de Linux necesarias, incluyendo 'zip' y 'composer'
+RUN apk add --no-cache \
+    git \
+    zip \
+    unzip \
+    bash \
+    composer \
+    nodejs \
+    npm 
 
-[phases.build]
-cmds = [
-  "npm run build"
-]
+# Instala la extensión ZIP de PHP
+RUN docker-php-ext-install zip
 
-[start]
-cmd = "php artisan migrate --force && php artisan optimize && php -S 0.0.0.0:$PORT -t public"
+# Establece el directorio de trabajo
+WORKDIR /app
+
+# Copia los archivos de la aplicación
+COPY . /app
+
+# Instala las dependencias de PHP con Composer
+RUN composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction
+
+# Instala y compila los assets de Node
+RUN npm ci --production=false
+RUN npm run build
+
+# El comando de inicio para la aplicación (usando el servidor integrado de PHP)
+# IMPORTANTE: Se han eliminado 'php artisan migrate' y 'php artisan optimize'.
+# La aplicación solo iniciará el servidor web.
+# Las operaciones de base de datos se harán manualmente.
+CMD php -S 0.0.0.0:$PORT -t public
