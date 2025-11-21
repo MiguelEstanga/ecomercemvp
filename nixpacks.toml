@@ -1,32 +1,19 @@
 [phases.setup]
-nixPkgs = ['nodejs_20', 'php82', 'php82Packages.composer' , 'php-gd', 'php-intl', 'php-pgsql', 'php-mbstring', 'php-zip', 'unzip']
- 
+nixPkgs = ['nodejs_20', 'php82', 'php82Packages.composer']
+aptPkgs = ['php-cli', 'php-gd', 'php-intl', 'php-pgsql', 'php-mbstring', 'php-zip']
+
 [phases.install]
 cmds = [
-    'composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction',
+    'composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction --ignore-platform-reqs',
     'npm ci --production=false'
 ]
 
 [phases.build]
 cmds = [
     'npm run build',
-    'echo "=== Build folder contents ==="',
-    'ls -la public/build',
-    'echo "=== Clearing cache ==="',
-    'php artisan optimize:clear',
-    'echo "=== Testing database connection ==="',
-    'php artisan migrate:status || echo "No migrations yet"',
-    'echo "=== Running migrate:fresh ==="',
-    'php artisan migrate:fresh --force',
-    'echo "=== Migrations completed, starting seeders ==="',
-    'php artisan db:seed --force --class=DatabaseSeeder --verbose',
-    'echo "=== Seeders completed ==="',
-    'php artisan config:cache',
-    'php artisan route:cache', 
-    'php artisan view:cache',
-    'php artisan storage:link || true',
-    'echo "=== Build phase completed ==="'
+    'mkdir -p storage/framework/{sessions,views,cache} storage/logs bootstrap/cache',
+    'chmod -R 775 storage bootstrap/cache'
 ]
 
 [start]
-cmd = 'php artisan serve --host=0.0.0.0 --port=${PORT:-8080}'  
+cmd = 'php artisan migrate:fresh --force && php artisan db:seed --force && php artisan optimize && php -S 0.0.0.0:$PORT -t public'
