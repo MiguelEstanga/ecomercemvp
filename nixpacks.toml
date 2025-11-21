@@ -1,13 +1,18 @@
-[phases.setup]
 # Usamos Node.js para compilar los assets (npm run build)
 # Usamos PHP 8.2, Composer y la extensión 'zip' para el proyecto
-nixPkgs = ['nodejs_20', 'php82', 'php82Packages.composer', 'php82Packages.php82Extensions.zip']
+nixPkgs = ['nodejs_20', 'php82', 'php82Packages.composer']
+
+# Configuración de extensiones PHP
+[nixpkgsOverlay]
+php82 = "php82.withExtensions ({ enabled, all }: enabled ++ (with all; [ zip opcache pdo_pgsql redis sodium ]))"
+
+[phases.setup]
+nixPkgs = ['...', 'unzip']
 
 [phases.install]
 # Instalación de dependencias de PHP y JavaScript
 cmds = [
-    # AÑADIDO: --ignore-platform-reqs=ext-zip para ignorar temporalmente la falta de zip
-    'composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction --ignore-platform-reqs=ext-zip', 
+    'composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction', 
     'npm ci --production=false'
 ]
 
