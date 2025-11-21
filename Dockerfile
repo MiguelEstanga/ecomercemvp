@@ -28,30 +28,25 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Establecer directorio de trabajo
 WORKDIR /app
 
-# Copiar TODOS los archivos primero (esto es clave)
+# Copiar archivos de aplicación
 COPY . .
 
-# Ahora sí instalar dependencias PHP (con todos los archivos ya presentes)
+# Instalar dependencias PHP (sin scripts que requieran DB)
 RUN composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction --no-scripts
 
-# Ejecutar scripts de Composer ahora que todo está copiado
+# Ejecutar autoload
 RUN composer dump-autoload --optimize
 
 # Instalar dependencias Node
 RUN npm ci --production=false
 
-# Construir assets
+# Construir assets de frontend
 RUN npm run build
 
 # Limpiar caché de npm
 RUN npm cache clean --force
 
-# Optimizar Laravel
-RUN php artisan config:clear && \
-    php artisan cache:clear && \
-    php artisan view:clear
-
-# Crear directorios necesarios y permisos
+# Crear directorios necesarios y dar permisos
 RUN mkdir -p storage/framework/sessions \
     storage/framework/views \
     storage/framework/cache \
@@ -62,8 +57,9 @@ RUN mkdir -p storage/framework/sessions \
 # Exponer puerto
 EXPOSE 8080
 
-# Comando de inicio
+# Comando de inicio - aquí SÍ se ejecutan comandos de Laravel
 CMD php artisan config:cache && \
     php artisan route:cache && \
     php artisan view:cache && \
+    php artisan migrate --force && \
     php artisan serve --host=0.0.0.0 --port=8080
