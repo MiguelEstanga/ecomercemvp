@@ -36,8 +36,12 @@
         ]
     },
     "autoload-dev": {
+        "files": [
+            "app/Helper/uploadAndGetPath.php"
+        ],
         "psr-4": {
             "Tests\\": "tests/"
+            
         }
     },
     "scripts": {
