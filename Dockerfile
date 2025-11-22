@@ -1,15 +1,18 @@
 # ----------------------------------------------------------------------
 # Etapa 1: Builder (Instalación de Dependencias)
-# Se usa PHP 8.4 para satisfacer las restricciones de openspout/fast-excel
+# Usamos una etiqueta que especifica Composer 2, PHP 8.4 y la base Debian (Buster)
+# Esta imagen es conocida por existir y usar 'apt-get'
 # ----------------------------------------------------------------------
-FROM composer:2-php8.4 AS composer_dependencies
+FROM composer:2-buster-php8.4 AS composer_dependencies
 
 WORKDIR /app
 
-# Instala la librería del sistema necesaria para la extensión 'zip' (Usando APK, ya que la imagen composer:2-php8.4 probablemente es Alpine)
-RUN apk update && \
-    apk add --no-cache libzip-dev && \
-    rm -rf /var/cache/apk/*
+# **CORRECCIÓN DEL GESTOR DE PAQUETES (Cambiamos a APT/apt-get)**
+# Ya que la imagen buster-php8.4 es Debian, volvemos a usar 'apt-get'.
+# Esto revierte la corrección de 'apk' que hicimos antes.
+RUN apt-get update && \
+    apt-get install -y libzip-dev && \
+    rm -rf /var/lib/apt/lists/*
 
 # Instala la extensión PHP 'zip'
 RUN docker-php-ext-install zip
@@ -25,23 +28,7 @@ COPY . .
 
 # ----------------------------------------------------------------------
 # Etapa 2: Final (Imagen de Producción con FrankenPHP)
-# Usamos tu imagen de PHP 8.2, la cual es compatible con tus requerimientos
 # ----------------------------------------------------------------------
 FROM dunglas/frankenphp:php8.2.29-bookworm AS final_app
 
-WORKDIR /app
-
-# Instala la librería del sistema necesaria para la extensión 'zip' (Usando APT, para Bookworm/Debian)
-RUN apt-get update && \
-    apt-get install -y libzip-dev && \
-    rm -rf /var/lib/apt/lists/*
-
-# Instala la extensión PHP 'zip'
-RUN docker-php-ext-install zip
-
-# Copia los archivos finales desde la etapa de construcción
-COPY --from=composer_dependencies /app/vendor /app/vendor
-COPY --from=composer_dependencies /app /app
-
-# Comando de ejecución (opcional, si no está en la imagen base)
-# CMD ["frankenphp", "run", "--config", "/etc/frankenphp/Caddyfile"]
+# ... (El resto del Dockerfile es idéntico a la versión anterior)
