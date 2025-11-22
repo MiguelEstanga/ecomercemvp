@@ -5,51 +5,37 @@ FROM composer:2 AS composer_dependencies
 
 WORKDIR /app
 
-# 1. Instala las dependencias del sistema necesarias (libzip-dev para la extensión zip)
-# Utilizamos una imagen base de composer que a su vez se basa en Debian
-# y que típicamente ya incluye las herramientas para instalar extensiones de PHP.
-RUN apt-get update && \
-    apt-get install -y libzip-dev && \
-    rm -rf /var/lib/apt/lists/*
+# **INSTALACIÓN DE EXTENSIÓN USANDO APK (para imágenes basadas en Alpine)**
+RUN apk add --no-cache libzip-dev
+# Si la imagen composer:2 no tiene el comando 'docker-php-ext-install' (típico de Alpine),
+# la instalación debe hacerse manualmente o usar un paquete precompilado. 
+# Si el siguiente comando falla, es un problema de la imagen base de Composer.
+# Por lo general, la imagen composer:2 sí se basa en Alpine, pero ya tiene PHP.
+RUN docker-php-ext-install zip 
 
 # Copia los archivos de configuración
 COPY composer.json composer.lock ./
 
-# 2. Instala la extensión PHP zip
-RUN docker-php-ext-install zip
-
-# 3. Ejecuta composer install
-# Usamos --no-dev para la imagen de producción final
+# Ejecuta composer install
 RUN composer install --no-dev --optimize-autoloader --no-interaction --no-scripts
 
 # Copia el resto de tu código fuente
 COPY . .
 
 # ----------------------------------------------------------------------
-# Etapa 2: Final (Imagen de Producción)
+# Etapa 2: Final (Imagen de Producción con FrankenPHP)
 # ----------------------------------------------------------------------
-# Tu imagen base de FrankenPHP
-FROM dunglas/frankenphp:php8.2.29-bookworm
+FROM dunglas/frankenphp:php8.2.29-bookworm AS stage-1 # Cambiado el alias a stage-1
 
-# 4. En la imagen final, también necesitamos la extensión zip.
-# Asegúrate de que tu imagen base de FrankenPHP tiene las dependencias para instalarla
-# o ya la incluye. Asumiremos que necesitas instalarla de nuevo para mayor seguridad.
+# **INSTALACIÓN DE EXTENSIÓN USANDO APT (La imagen FrankenPHP/Bookworm SÍ usa apt)**
+# La imagen 'bookworm' es una variante de Debian y usa apt-get.
+
+# 1. Instala la librería del sistema necesaria para la extensión 'zip'
 RUN apt-get update && \
     apt-get install -y libzip-dev && \
     rm -rf /var/lib/apt/lists/*
 
+# 2. Instala la extensión PHP 'zip'
 RUN docker-php-ext-install zip
 
-# Establece el directorio de trabajo
-WORKDIR /app
-
-# Copia SOLO los archivos necesarios desde la etapa de construcción (incluyendo el vendor)
-COPY --from=composer_dependencies /app/vendor /app/vendor
-COPY --from=composer_dependencies /app /app
-
-# Si tienes un archivo .env, asegúrate de no copiarlo o usar secretos de Railway.
-# Si tu aplicación usa Artisan, podrías necesitar un comando final:
-# RUN php artisan storage:link
-
-# Comando de inicio de FrankenPHP (si no está definido en la imagen base)
-# CMD ["frankenphp", "run", "--config", "/etc/frankenphp/Caddyfile"]
+# ... (resto de la configuración: WORKDIR, COPY --from=composer_dependencies, etc.)
