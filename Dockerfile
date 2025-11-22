@@ -1,22 +1,24 @@
 # ----------------------------------------------------------------------
-# Etapa 1: Builder (Instalación de Dependencias)
+# Etapa 1: Builder (Instalación de Dependencias con Composer)
+# Se usa 'composer:2' que generalmente se basa en Alpine, usando 'apk'
 # ----------------------------------------------------------------------
 FROM composer:2 AS composer_dependencies
 
 WORKDIR /app
 
-# **INSTALACIÓN DE EXTENSIÓN USANDO APK (para imágenes basadas en Alpine)**
-RUN apk add --no-cache libzip-dev
-# Si la imagen composer:2 no tiene el comando 'docker-php-ext-install' (típico de Alpine),
-# la instalación debe hacerse manualmente o usar un paquete precompilado. 
-# Si el siguiente comando falla, es un problema de la imagen base de Composer.
-# Por lo general, la imagen composer:2 sí se basa en Alpine, pero ya tiene PHP.
-RUN docker-php-ext-install zip 
+# Instala la librería del sistema necesaria para la extensión 'zip' (Usando APK)
+RUN apk update && \
+    apk add --no-cache libzip-dev && \
+    rm -rf /var/cache/apk/*
 
 # Copia los archivos de configuración
 COPY composer.json composer.lock ./
 
-# Ejecuta composer install
+# Instala la extensión PHP 'zip' (asumiendo que docker-php-ext-install está disponible)
+RUN docker-php-ext-install zip
+
+# Ejecuta composer install para descargar las dependencias
+# Se usa --no-dev para la imagen de producción
 RUN composer install --no-dev --optimize-autoloader --no-interaction --no-scripts
 
 # Copia el resto de tu código fuente
@@ -24,18 +26,32 @@ COPY . .
 
 # ----------------------------------------------------------------------
 # Etapa 2: Final (Imagen de Producción con FrankenPHP)
+# Se usa 'dunglas/frankenphp:php8.2.29-bookworm', que usa 'apt-get'
 # ----------------------------------------------------------------------
-FROM dunglas/frankenphp:php8.2.29-bookworm AS stage-1 # Cambiado el alias a stage-1
+# **ATENCIÓN: SINTAXIS FROM CORREGIDA EN ESTA LÍNEA**
+FROM dunglas/frankenphp:php8.2.29-bookworm AS final_app
 
-# **INSTALACIÓN DE EXTENSIÓN USANDO APT (La imagen FrankenPHP/Bookworm SÍ usa apt)**
-# La imagen 'bookworm' es una variante de Debian y usa apt-get.
+# Establece el directorio de trabajo
+WORKDIR /app
 
-# 1. Instala la librería del sistema necesaria para la extensión 'zip'
+# Instala la librería del sistema necesaria para la extensión 'zip' (Usando APT)
 RUN apt-get update && \
     apt-get install -y libzip-dev && \
     rm -rf /var/lib/apt/lists/*
 
-# 2. Instala la extensión PHP 'zip'
+# Instala la extensión PHP 'zip'
 RUN docker-php-ext-install zip
 
-# ... (resto de la configuración: WORKDIR, COPY --from=composer_dependencies, etc.)
+# Copia SOLO los archivos necesarios desde la etapa de construcción (incluyendo el vendor)
+COPY --from=composer_dependencies /app/vendor /app/vendor
+COPY --from=composer_dependencies /app /app
+
+# Opcional: Configuración del usuario y permisos si es necesario
+# USER www-data
+
+# Si tu aplicación es Laravel/Symfony, puedes añadir comandos de setup aquí:
+# RUN php artisan storage:link
+# RUN php artisan optimize
+
+# El comando de inicio debe estar definido en la imagen base o aquí
+# CMD ["frankenphp", "run", "--config", "/etc/frankenphp/Caddyfile"]
