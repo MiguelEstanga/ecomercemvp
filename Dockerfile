@@ -10,6 +10,16 @@ WORKDIR /app
 # Copia los archivos necesarios para Composer (json y lock)
 COPY composer.json composer.lock ./
 
+RUN apt-get update && \
+    apt-get install -y libzip-dev && \
+    rm -rf /var/lib/apt/lists/*
+
+# 2. Instala la extensión PHP
+RUN docker-php-ext-install zip
+
+# Ahora sí, el comando de composer install
+RUN composer install --no-interaction --optimize-autoloader --no-scripts
+
 # Ejecuta composer install. Usamos --no-dev para la imagen de producción.
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
