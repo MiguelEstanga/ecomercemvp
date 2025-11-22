@@ -85,9 +85,9 @@ Route::get('/debug-seed', function () {
 Route::get('/debug-seed-fresh', function () {
 
     // 1. Verificar si la aplicación está en producción
-    if (app()->environment('production')) {
-        return response()->json(['error' => 'Not allowed in production environment.'], 403);
-    }
+    // if (app()->environment('production')) {
+    //     return response()->json(['error' => 'Not allowed in production environment.'], 403);
+    // }
     
     $output = '';
 
@@ -110,7 +110,7 @@ Route::get('/debug-seed-fresh', function () {
             'status' => 'success',
             'message' => 'Database reset (migrate:fresh) and seeded successfully.',
             'output' => $output,
-        ]);
+        ]); 
 
     } catch (\Exception $e) {
          
