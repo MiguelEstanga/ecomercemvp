@@ -52,6 +52,7 @@ class MainController extends Controller
     {
         try {
             $products = $this->productServices->getAllProducts();
+            
             return view('main.index', ['products' => $products]);
         } catch (\Exception $e) {
             Log::error('Error al obtener los productos: ' . $e->getMessage());

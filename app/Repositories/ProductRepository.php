@@ -18,7 +18,7 @@ class ProductRepository implements ProductRepositoryInterface
 
   public function all(): array|null
   {
-    $products = $this->model->where('active' , true)->with('product_imagens')->get();
+    $products = $this->model->where('is_active' , true)->with('product_imagens')->get();
     return $products->toArray();
   }
 
