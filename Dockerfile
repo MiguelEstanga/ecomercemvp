@@ -1,34 +1,28 @@
 # ----------------------------------------------------------------------
-# Etapa 1: Builder (Instalación de Dependencias)
-# Usamos una etiqueta que especifica Composer 2, PHP 8.4 y la base Debian (Buster)
-# Esta imagen es conocida por existir y usar 'apt-get'
-# ----------------------------------------------------------------------
-FROM composer:2-buster-php8.4 AS composer_dependencies
-
-WORKDIR /app
-
-# **CORRECCIÓN DEL GESTOR DE PAQUETES (Cambiamos a APT/apt-get)**
-# Ya que la imagen buster-php8.4 es Debian, volvemos a usar 'apt-get'.
-# Esto revierte la corrección de 'apk' que hicimos antes.
-RUN apt-get update && \
-    apt-get install -y libzip-dev && \
-    rm -rf /var/lib/apt/lists/*
-
-# Instala la extensión PHP 'zip'
-RUN docker-php-ext-install zip
-
-# Copia los archivos de configuración
-COPY composer.json composer.lock ./
-
-# Ejecuta composer install
-RUN composer install --no-dev --optimize-autoloader --no-interaction --no-scripts
-
-# Copia el resto de tu código fuente
-COPY . .
-
-# ----------------------------------------------------------------------
 # Etapa 2: Final (Imagen de Producción con FrankenPHP)
 # ----------------------------------------------------------------------
 FROM dunglas/frankenphp:php8.2.29-bookworm AS final_app
 
-# ... (El resto del Dockerfile es idéntico a la versión anterior)
+WORKDIR /app
+
+# ... (Instalación de zip y otras configuraciones de la Etapa 2)
+
+# Copia los archivos finales desde la etapa de construcción
+COPY --from=composer_dependencies /app/vendor /app/vendor
+COPY --from=composer_dependencies /app /app
+
+# **AGREGAR O REVISAR ESTE BLOQUE DE PERMISOS**
+# El usuario de FrankenPHP es 'www-data'. Necesita escribir en 'storage' y 'cache'.
+
+# 1. Cambiar el dueño de todos los archivos al usuario 'www-data'
+# (Esto es crucial para que el servidor web pueda leer los archivos)
+RUN chown -R www-data:www-data /app
+
+# 2. Dar permisos de escritura (775) a los directorios críticos de Laravel
+RUN chmod -R 775 /app/storage /app/bootstrap/cache
+
+# 3. Cambiar el usuario por defecto del contenedor a 'www-data' (mejor práctica de seguridad/permisos)
+USER www-data
+
+# Opcional: El comando de inicio debe estar definido en la imagen base o aquí
+# CMD ["frankenphp", "run", "--config", "/etc/caddy/Caddyfile"]
