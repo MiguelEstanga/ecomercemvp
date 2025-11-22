@@ -2,7 +2,7 @@
 nixPkgs = ['php82', 'php82Extensions.zip', 'php82Extensions.pdo_mysql']
 
 [phases.build]
-cmds = ['composer install --no-dev --optimize-autoloader --no-scripts --no-interaction']
+cmds = ['composer install --no-dev --optimize-autoloader --no-scripts --no-interaction --ignore-platform-req=ext-zip']
 
 [start]
 cmd = 'php artisan serve --host=0.0.0.0 --port=$PORT'
