@@ -60,22 +60,22 @@ class ProductForm extends Component
     {
         $this->validate(); // Ejecuta las reglas de validación
 
-        // Product::create([
-        //     'name' => $this->name,
-        //     'slug' => $this->slug,
-        //     'description' => $this->description,
-        //     'price' => $this->price,
-        //     'stock' => $this->stock,
-        //     'is_active' => $this->is_active,
-        // ]);
+        Product::create([
+            'name' => $this->name,
+            'slug' => $this->slug,
+            'description' => $this->description,
+            'price' => $this->price,
+            'stock' => $this->stock,
+            'is_active' => $this->is_active,
+        ]);
 
-        // // Cierra el modal después de guardar
-        // $this->closeModal();
+        // Cierra el modal después de guardar
+        $this->closeModal();
 
-        // Emite un evento a Livewire para que la tabla de productos sepa que debe refrescarse
-        // $this->dispatch('product-saved');
+         
+        $this->dispatch('product-saved');
 
-        // Opcional: Notificación (ej: $this->dispatch('notify', 'Producto creado con éxito.'));
+      
     }
 
     public function render()

@@ -25,22 +25,11 @@ class AdminMiddleware
 
         // Verificar que el usuario tenga el rol de admin
         // Opción 1: Si usas Spatie Permission
-        Log::info('Auth::user()->hasRole(admin): ' . Auth::user()->hasRole('administrador'));
-        Log::info('Auth::user()->hasRole(admin): ' . Auth::user()->roles);
+
         if (!Auth::user()->hasRole('administrador')) {
             abort(403, 'No tienes permisos para acceder a esta área');
         }
 
-        // Opción 2: Si tienes un campo 'is_admin' en la tabla users
-        // if (!auth()->user()->is_admin) {
-        //     abort(403, 'No tienes permisos para acceder a esta área');
-        // }
-
-        // Opción 3: Si verificas por email específico
-        // $adminEmails = ['admin@example.com', 'tu@email.com'];
-        // if (!in_array(auth()->user()->email, $adminEmails)) {
-        //     abort(403, 'No tienes permisos para acceder a esta área');
-        // }
 
         return $next($request);
     }

@@ -1,5 +1,4 @@
-php artisan migrate --force
-
+php artisan migrate:fresh --seed
 # Clear cache
 php artisan optimize:clear
 
