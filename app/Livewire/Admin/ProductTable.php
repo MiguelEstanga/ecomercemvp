@@ -7,6 +7,7 @@ use App\Models\products as Product;
 use Livewire\WithPagination;
 use App\services\ProductServices;
 use App\services\FileService;
+use Illuminate\Support\Facades\Log;
 
 class ProductTable extends Component
 {
@@ -57,32 +58,51 @@ class ProductTable extends Component
 
     public function deleteProduct($productId)
     {
-        $this->dispatch('startLoading');
+
+        $this->dispatch('startLoading', message: 'Eliminando producto...');
+
         try {
-            
             $result = $this->productServices->delete((int) $productId);
 
-            // Verifica si el servicio devolvió un error
             if ($result['error'] !== null) {
-
                 $errorMessage = is_string($result['error']) ? $result['error'] : 'Error al eliminar el producto.';
                 session()->flash('error', $errorMessage);
+            } else {
+                session()->flash('success', 'Producto eliminado exitosamente.');
+            }
+        } catch (\Exception $e) {
+            session()->flash('error', 'Ocurrió un error inesperado al eliminar el producto.');
+            Log::error('Error inesperado al eliminar producto: ' . $e->getMessage());
+        }finally{
+            $this->dispatch('stopLoading');
+        }
 
+        
+       
+    }
+
+    public function activarProducto($productId)
+    {
+        $this->dispatch('startLoading');
+        try {
+            $result = $this->productServices->activarProducto((int) $productId);
+            // Verifica si el servicio devolvió un error
+            if ($result['error'] !== null) {
+                $errorMessage = is_string($result['error']) ? $result['error'] : 'Error al activar el producto.';
+                session()->flash('error', $errorMessage);
                 return;
             }
-
-
-            session()->flash('success', 'Producto eliminado exitosamente.');
-            return; 
-
+            session()->flash('success', 'Producto activado exitosamente.');
+            return;
         } catch (\Exception $e) {
             // Este catch solo atraparía errores muy inesperados (ej. si el servicio falla por completo)
             // La mayoría de los errores de negocio deben manejarse dentro del servicio.
-            session()->flash('error', 'Ocurrió un error inesperado al eliminar el producto.');
+            session()->flash('error', 'Ocurrió un error inesperado al activar el producto.');
             return;
-        }finally{
+        } finally {
             $this->dispatch('stopLoading');
-        }    
+            $this->render();
+        }
     }
 
 

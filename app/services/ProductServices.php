@@ -90,19 +90,6 @@ class ProductServices
         ];
       }
 
-      // 2. Verificar y eliminar archivos asociados (imágenes)
-      // Nota: Asume que 'product_imagens' es la relación que devuelve una colección
-      if ($product->product_imagens->isNotEmpty()) {
-
-        // Recopilar los paths de las imágenes para pasárselos al servicio de archivos
-        $pathsToDelete = $product->product_imagens->pluck('path')->toArray();
-
-
-        $this->fileService->deleteMultiple($pathsToDelete);
-      }
-
-      // 3. Eliminar el producto de la base de datos
-      // Se llama después de la eliminación de archivos para tener el objeto completo en caso de error
       $deletedProduct = $this->productRepository->delete($productId);
 
       // Si la eliminación fue exitosa, devolvemos el objeto que fue eliminado
@@ -118,6 +105,41 @@ class ProductServices
       return [
         'data' => null,
         'error' => 'Error al procesar la eliminación: ' . $e->getMessage(),
+      ];
+    }
+  }
+
+  public function activarProducto(int $productId): array
+  {
+    try {
+      // 1. Obtener el producto antes de eliminarlo para acceder a sus relaciones (imágenes)
+      // La implementación del Repositorio debe asegurar que las imágenes se carguen (eager loading)
+      $product = $this->productRepository->findId($productId);
+
+      if (!$product) {
+        // Manejar el caso de que el producto no exista
+        return [
+          'data' => null,
+          'error' => 'Producto no encontrado.',
+        ];
+      }
+
+      $product->is_active = true;
+      $product->save();
+
+      // Si la eliminación fue exitosa, devolvemos el objeto que fue eliminado
+      return [
+        'data' => $product,
+        'error' => null,
+      ];
+    } catch (\Exception $e) {
+      // 4. Captura y Manejo de Errores
+      // Registra el error para depuración
+      Log::error("Error al activar el producto con ID {$productId}: " . $e->getMessage());
+
+      return [
+        'data' => null,
+        'error' => 'Error al procesar la activación: ' . $e->getMessage(),
       ];
     }
   }

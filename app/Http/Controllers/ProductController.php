@@ -30,6 +30,9 @@ class ProductController extends Controller
     {
         try {
             $product = $this->productServices->findId($id);
+            if($product->is_active == false){
+                return redirect()->route('home');
+            }
             $comment = $this->commentService->findAll($id);
 
             return view(
@@ -117,4 +120,6 @@ class ProductController extends Controller
             return response()->json(['message' => 'Error al crear producto'], 500);
         }
     }
+
+    
 }

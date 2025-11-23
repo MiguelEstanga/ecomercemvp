@@ -16,7 +16,7 @@
         }
     </style>
     {{-- @vite(['resources/css/app.css', 'resources/js/app.js']) --}}
-       
+
 </head>
 
 <body class="bg-gray-100 font-sans antialiased">
@@ -35,12 +35,33 @@
 
         </div>
     </div>
-    <livewire:components.loader />
+    <livewire:components.loader wire:key="loader-global" />
+
     {{-- Livewire Scripts --}}
     @livewireScripts
 
     {{-- Scripts adicionales --}}
     @stack('scripts')
+    <script>
+        document.addEventListener('livewire:init', () => {
+            const loader = document.getElementById('loader');
+             
+            
+            Livewire.on('startLoading', (data) => {
+                 
+                console.log(loader);
+                console.log('corgando');
+                loader.classList.remove('hidden'); 
+            });
+
+            Livewire.on('stopLoading', () => {
+                console.log('finalizando');
+                 console.log(loader);
+               // loader.classList.add('hidden');
+                
+            });
+        });
+    </script>
 </body>
 
 </html>

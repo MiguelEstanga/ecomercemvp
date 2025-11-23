@@ -4,15 +4,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Elegante | Tema Oscuro</title>
+    <title>Login </title>
     <link rel="icon" type="image/png" href="/icon.ico">
-
+    <title>@yield('title', config('seo.site_name'))</title>
     {{-- La directiva @vite es esencial para cargar los estilos compilados de Tailwind --}}
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
 </head>
 
-<body class="bg-white min-h-screen flex items-center justify-center antialiased">
+<body class="bg-sky-50 min-h-screen flex items-center justify-center antialiased">
 
     {{-- Tarjeta de Login (bg-gray-800 para contraste) --}}
     <div class="max-w-md w-full p-8 space-y-8 bg-gray-800 rounded-xl shadow-2xl z-10 bg-white">
@@ -29,30 +29,13 @@
 
         <form class="mt-8 space-y-6" action="{{ route(name: 'login.post') }}" method="POST">
             @csrf
-
+            <x-form-input name="email" label="Correo Electrónico" placeholder="Correo Electrónico" />
             {{-- Campo Email --}}
-            <div class="rounded-md shadow-sm -space-y-px">
-                <div>
-                    <label for="email" class="sr-only">Correo Electrónico</label>
-                    <input id="email" name="email" type="email" autocomplete="email" required
-                        class="appearance-none relative block w-full px-3 py-2 border border-gray-700 placeholder-gray-500 text-gray-100 bg-gray-700 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm rounded-t-md"
-                        placeholder="Correo Electrónico" value="{{ old('email') }}">
-                    @error('email')
-                        <p class="mt-2 text-sm text-red-400">{{ $message }}</p>
-                    @enderror
-                </div>
-            </div>
+
 
             {{-- Campo Contraseña --}}
-            <div>
-                <label for="password" class="sr-only">Contraseña</label>
-                <input id="password" name="password" type="password" autocomplete="current-password" required
-                    class="appearance-none relative block w-full px-3 py-2 border border-gray-700 placeholder-gray-500 text-gray-100 bg-gray-700 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm rounded-b-md"
-                    placeholder="Contraseña">
-                @error('password')
-                    <p class="mt-2 text-sm text-red-400">{{ $message }}</p>
-                @enderror
-            </div>
+            <x-form-input name="password" label="Contraseña" placeholder="Contraseña" />
+
 
             {{-- Recordarme y Enlace de Olvido --}}
             <div class="flex items-center justify-between">

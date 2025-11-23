@@ -145,7 +145,7 @@
                 </form>
 
                 {{-- Información Adicional --}}
-                <div class="border-t pt-6 space-y-3 text-sm text-white-600">
+                {{-- <div class="border-t pt-6 space-y-3 text-sm text-white-600">
                     <div class="flex items-center gap-3">
                         <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
@@ -166,7 +166,7 @@
                         </svg>
                         <span>Entrega en 3-5 días hábiles</span>
                     </div>
-                </div>
+                </div> --}}
             </div>
         </div>
 

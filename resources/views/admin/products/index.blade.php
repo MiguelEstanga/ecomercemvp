@@ -13,5 +13,5 @@
     </div>
     @livewire('admin.product-table')
     @livewire('admin.product-form')
-
+    @livewire('admin.edit-product-form')
 @endsection
