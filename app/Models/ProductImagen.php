@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Models\products as Product;
+use App\Models\Product;
 class ProductImagen extends Model
 {
     public $fillable = [

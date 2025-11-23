@@ -11,7 +11,7 @@ use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\Admin\AdminController;
 use Illuminate\Support\Facades\Auth;
-use App\Models\products as Product;
+use App\Models\Product;
 use Illuminate\Support\Facades\File;
 
 Route::get('/',  [MainController::class, 'index'])->name('home');

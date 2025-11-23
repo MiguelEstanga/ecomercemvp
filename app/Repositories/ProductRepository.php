@@ -2,7 +2,7 @@
 
 namespace App\Repositories;
 
-use App\Models\products as Product;
+use App\Models\Product;
 use App\Repositories\Contracts\ProductRepositoryInterface;
 
 

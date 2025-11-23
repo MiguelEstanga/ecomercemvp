@@ -3,7 +3,7 @@
 namespace App\Livewire\Admin;
 
 use Livewire\Component;
-use App\Models\products as Product; // Asegúrate de que 'products' sea tu modelo
+use App\Models\Product  ; // Asegúrate de que 'products' sea tu modelo
 use Livewire\Attributes\On; // Necesario para escuchar eventos JS
 use Livewire\WithFileUploads;
 class ProductForm extends Component

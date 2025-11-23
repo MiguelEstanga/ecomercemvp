@@ -3,7 +3,7 @@
 namespace App\Livewire\Admin;
 
 use Livewire\Component;
-use App\Models\products as Product;
+use App\Models\Product;
 use Livewire\WithPagination;
 use App\services\ProductServices;
 use App\services\FileService;

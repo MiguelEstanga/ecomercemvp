@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Models\products as Product; // Asegúrate de que el modelo Product existe
+use App\Models\Product ; // Asegúrate de que el modelo Product existe
 use Illuminate\Support\Str;
 
 class ProductSeeder extends Seeder
@@ -16,10 +16,10 @@ class ProductSeeder extends Seeder
     {
         $products = [
             [
-                'name' => 'Taza de Café Programador',
-                'price' => 12.99,
+                'name' => 'CYTOTEC 200mcg tableta de 12 miligramos',
+                'price' => 45,
                 'stock' => 50,
-                'description' => 'Taza de cerámica con diseño de código binario. ¡Perfecta para la cafeína de la mañana!',
+                'description' => 'tableta de 12 miligramos CYTOTEC 200mcg',
             ],
             [
                 'name' => 'Camiseta Laravel Roja',

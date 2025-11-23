@@ -5,7 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\User;
-use App\Models\products as Product;
+use App\Models\Product;
 use App\Models\Orders;
 use App\Models\PaymentMethods;
 use App\Models\PinchupAgencies;
