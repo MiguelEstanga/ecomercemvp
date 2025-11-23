@@ -5,22 +5,49 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    {{-- Favicons --}}
     <link rel="icon" type="image/png" href="/icon.ico">
-    <title>@yield('title', config('seo.site_name'))</title>
-    <meta name="google-site-verification" content="WmwhuvSo-LqgLykIqyhtp9Jp4JkurAQKbVSDlUCaQak" />
-    <meta property="og:title" content="@yield('title', config('seo.site_name'))">
-    <meta property="og:description" content="@yield('description', config('seo.site_description'))">
-    <meta property="og:image" content="{{ asset(config('seo.og_image')) }}">
-    <meta property="og:url" content="{{ url()->current() }}">
-    <meta property="og:type" content="website">
+    <link rel="apple-touch-icon" href="/icon.ico">
+    <title>@yield('title')</title>
 
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="@yield('title', config('seo.site_name'))">
-    <meta name="twitter:description" content="@yield('description', config('seo.site_description'))">
-    <meta name="twitter:image" content="{{ asset(config('seo.og_image')) }}">
 
     <link rel="canonical" href="{{ url()->current() }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    {{-- SEO Básico --}}
+    <title>@yield('title', config('seo.site_name'))</title>
+    <meta name="description" content="@yield('description', config('seo.site_description'))">
+    <meta name="keywords" content="@yield('keywords', config('seo.site_keywords'))">
+    <meta name="author" content="{{ config('seo.author') }}">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="Spanish">
+    <meta name="revisit-after" content="7 days">
+
+    {{-- Canonical URL --}}
+    <link rel="canonical" href="{{ url()->current() }}">
+
+    {{-- Open Graph / Facebook --}}
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:title" content="@yield('og_title', config('seo.site_name'))">
+    <meta property="og:description" content="@yield('og_description', config('seo.site_description'))">
+    <meta property="og:image" content="{{ asset(config('seo.og_image')) }}">
+    <meta property="og:site_name" content="{{ config('seo.site_name') }}">
+    <meta property="og:locale" content="es_VE">
+
+    {{-- Twitter Cards --}}
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="{{ url()->current() }}">
+    <meta name="twitter:title" content="@yield('twitter_title', config('seo.site_name'))">
+    <meta name="twitter:description" content="@yield('twitter_description', config('seo.site_description'))">
+    <meta name="twitter:image" content="{{ asset(config('seo.og_image')) }}">
+    <meta name="twitter:site" content="{{ config('seo.twitter_handle') }}">
+    {{-- Google Site Verification - AGREGAR CUANDO LO OBTENGAS --}}
+    <meta name="google-site-verification" content="WmwhuvSo-LqgLykIqyhtp9Jp4JkurAQKbVSDlUCaQak" />
+    <meta name="geo.region" content="VE">
+    <meta name="geo.placename" content="Venezuela">
+   
+   
+     
     <style>
         /* CSS simple para asegurar que el footer se quede abajo */
         .flex-wrapper {

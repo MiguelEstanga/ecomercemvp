@@ -1,2 +1,8 @@
 User-agent: *
-Disallow:
+Allow: /
+Sitemap: https://cytotecfemvenezuela.com/sitemap.xml
+
+# Bloquear áreas privadas
+Disallow: /admin/
+Disallow: /api/
+Disallow: /login

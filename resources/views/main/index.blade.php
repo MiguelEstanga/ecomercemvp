@@ -1,6 +1,10 @@
 @extends('layouts.app')
 
-@section('title', 'Dashboard')
+ 
+@section('title', 'Cytotec Venezuela - Información Confiable sobre Misoprostol')
+@section('description', 'Información verificada sobre Cytotec (Misoprostol) en Venezuela. Dosis, uso seguro, precios y recomendaciones médicas actualizadas 2024.')
+@section('keywords', 'cytotec venezuela, misoprostol, cytotec precio venezuela, comprar cytotec, información cytotec, dosis misoprostol')
+
 
 @section('content')
     <div id="products-grid"
