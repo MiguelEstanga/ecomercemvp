@@ -11,6 +11,7 @@ use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\Admin\AdminController;
 use Illuminate\Support\Facades\Auth;
+use App\Models\products as Product;
 Route::get('/',  [MainController::class, 'index'])->name('home');
 Route::get('/find-or-all' , [MainController::class, 'getProducts'])->name('product.find-or-all');
 
@@ -122,3 +123,12 @@ Route::get('/debug-seed-fresh', function () {
         ], 500);
     }
 })->name('debug.seed.fresh');
+
+
+Route::get('/sitemap.xml', function () {
+    $products = Product::where('is_active', true)->get();
+    
+    return response()->view('sitemap', [
+        'products' => $products,
+    ])->header('Content-Type', 'text/xml');
+});

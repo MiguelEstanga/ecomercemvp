@@ -7,7 +7,7 @@
 
     <link rel="icon" type="image/png" href="/icon.ico">
     <title>@yield('title', config('seo.site_name'))</title>
-
+    <meta name="google-site-verification" content="WmwhuvSo-LqgLykIqyhtp9Jp4JkurAQKbVSDlUCaQak" />
     <meta property="og:title" content="@yield('title', config('seo.site_name'))">
     <meta property="og:description" content="@yield('description', config('seo.site_description'))">
     <meta property="og:image" content="{{ asset(config('seo.og_image')) }}">
