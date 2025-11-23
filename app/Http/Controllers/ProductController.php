@@ -30,7 +30,7 @@ class ProductController extends Controller
     {
         try {
             $product = $this->productServices->findId($id);
-            if($product->is_active == false){
+            if ($product->is_active == false) {
                 return redirect()->route('home');
             }
             $comment = $this->commentService->findAll($id);
@@ -93,16 +93,18 @@ class ProductController extends Controller
 
     public function create(Request $request)
     {
+        Log::info('creando archivo ' );
         DB::beginTransaction();
+        Log::info('preparndo transaction ');
         $path = null;
         if ($request->hasFile('imagen')) {
             $path = $this->fileService->upload($request->file('imagen'), 'product', 'public');
         }
-        try {
-
-
+        Log::info('preparndo transaction ' );
+        Log::info(  $path);
+        try { 
             $producto = $this->productServices->create($request);
-
+            Log::info('producto listo ' );
             ProductImagen::create([
                 'product_id' => $producto->id,
                 'path' => $path,
@@ -120,6 +122,4 @@ class ProductController extends Controller
             return response()->json(['message' => 'Error al crear producto'], 500);
         }
     }
-
-    
 }
