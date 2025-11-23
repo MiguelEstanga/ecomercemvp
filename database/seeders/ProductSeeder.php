@@ -6,7 +6,7 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Product ; // Asegúrate de que el modelo Product existe
 use Illuminate\Support\Str;
-
+use Illuminate\Support\Facades\Log;
 class ProductSeeder extends Seeder
 {
     /**
@@ -35,13 +35,17 @@ class ProductSeeder extends Seeder
             ],
         ];
 
-        foreach ($products as $productData) {
+        try{
+            foreach ($products as $productData) {
             Product::create(array_merge($productData, [
                 'slug' => Str::slug($productData['name']),
                 'is_active' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]));
+        }
+        }catch (\Exception $e){
+            Log::error($e->getMessage());
         }
     }
 }
