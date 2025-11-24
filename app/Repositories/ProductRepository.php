@@ -52,11 +52,11 @@ class ProductRepository implements ProductRepositoryInterface
   {
     $product = new Product();
     $product->name = $data['name'];
-    $product->slug = $data['slug'];
+    $product->SKU = $data['sku'];
     $product->description = $data['description'];
     $product->price = $data['price'];
     $product->stock = $data['stock'];
-
+    $product->category_id = $data['category_id'];
     $product->save();
 
     return $product;
@@ -66,12 +66,12 @@ class ProductRepository implements ProductRepositoryInterface
   {
     $product = $this->model->find($product_id);
     $product->name = $data['name'];
-    $product->slug = $data['slug'];
+    $product->SKU = $data['sku'];
     $product->description = $data['description'];
     $product->price = $data['price'];
     $product->stock = $data['stock'];
     $product->is_active = $data['is_active'];
-
+    $product->category_id = $data['category_id'];
     $product->save();
 
     return $product;

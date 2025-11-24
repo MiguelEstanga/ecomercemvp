@@ -20,6 +20,7 @@ class ProductSeeder extends Seeder
                 'price' => 45,
                 'stock' => 50,
                 'description' => 'tableta de 12 miligramos CYTOTEC 200mcg',
+                'category_id' => 1,
             ],
             [
                 'name' => 'Camiseta Laravel Roja',
@@ -38,7 +39,7 @@ class ProductSeeder extends Seeder
         try{
             foreach ($products as $productData) {
             Product::create(array_merge($productData, [
-                'slug' => Str::slug($productData['name']),
+                'SKU' => Str::slug($productData['name']),
                 'is_active' => true,
                 'created_at' => now(),
                 'updated_at' => now(),

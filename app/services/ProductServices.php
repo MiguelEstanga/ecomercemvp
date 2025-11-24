@@ -1,146 +1,438 @@
 <?php
 
-namespace app\services;
-
+namespace App\Services;
 
 use App\Repositories\ProductRepository;
-use App\services\FileService;
+use App\Services\FileService;
+use App\Models\Product;
+use App\Models\ProductImagen as ProductImagens  ;
 use Illuminate\Support\Facades\Log;
-
-
-
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class ProductServices
 {
-  protected $productRepository;
-  protected $fileService;
-  public function __construct(
-    FileService $fileService,
-    ProductRepository $productRepository
-  ) {
-    $this->productRepository = $productRepository;
-    $this->fileService = $fileService;
-  }
-  public function getAllProducts()
-  {
-    return $this->productRepository->all();
-  }
+    protected $productRepository;
+    protected $fileService;
 
-  public function findId($id)
-  {
-    $product = $this->productRepository->findId($id);
-
-    if (!$product) {
-      return null;
+    public function __construct(
+        FileService $fileService,
+        ProductRepository $productRepository
+    ) {
+        $this->productRepository = $productRepository;
+        $this->fileService = $fileService;
     }
 
-    return $product;
-  }
+    /**
+     * Obtener todos los productos
+     */
+    public function getAllProducts()
+    {
+        return $this->productRepository->all();
+    }
 
-  public function discount_stok(
-    $product_id,
-    $quantity
-  ) {
-    $product = $this->productRepository->discount_stok(
-      $product_id,
-      $quantity
-    );
+    /**
+     * Buscar producto por ID
+     */
+    public function findId($id)
+    {
+        $product = $this->productRepository->findId($id);
+        if (!$product) {
+            return null;
+        }
+        return $product;
+    }
 
+    /**
+     * Obtener productos con filtros y paginación
+     */
+    public function getProductsWithFilters(array $filters)
+    {
+        $query = Product::with(['category', 'product_imagens']);
 
-    return $product;
-  }
+        // Búsqueda
+        if (!empty($filters['search'])) {
+            $query->search($filters['search']);
+        }
 
-  public function buscarPorNombre($nombre)
-  {
-    $product = $this->productRepository->buscarPorNombre($nombre);
+        // Filtro por categoría
+        if (!empty($filters['category_id'])) {
+            $query->where('category_id', $filters['category_id']);
+        }
 
-    return $product;
-  }
+        // Filtro por estado
+        if (isset($filters['is_active']) && $filters['is_active'] !== '') {
+            $query->where('is_active', $filters['is_active']);
+        }
 
-  public function create($data)
-  {
-    $product = $this->productRepository->create($data);
-    return $product;
-  }
+        // Filtro por stock
+        if (!empty($filters['stock_filter'])) {
+            switch ($filters['stock_filter']) {
+                case 'in_stock':
+                    $query->where('stock', '>=', 10);
+                    break;
+                case 'low_stock':
+                    $query->where('stock', '>', 0)->where('stock', '<', 10);
+                    break;
+                case 'out_of_stock':
+                    $query->where('stock', 0);
+                    break;
+            }
+        }
 
-  public function update($product_id, $data)
-  {
-    $product = $this->productRepository->update($product_id, $data);
-    return $product;
-  }
+        // Ordenamiento
+        $sortField = $filters['sort_field'] ?? 'created_at';
+        $sortDirection = $filters['sort_direction'] ?? 'desc';
+        $query->orderBy($sortField, $sortDirection);
 
-  /**
-   * Elimina un producto de la base de datos y sus archivos asociados.
-   *
-   * @param int $productId El ID del producto a eliminar.
-   * @return array Devuelve un array con 'data' (producto eliminado) o 'error'.
-   */
-  public function delete(int $productId): array
-  {
-    try {
-      // 1. Obtener el producto antes de eliminarlo para acceder a sus relaciones (imágenes)
-      // La implementación del Repositorio debe asegurar que las imágenes se carguen (eager loading)
-      $product = $this->productRepository->findId($productId);
+        // Paginación
+        $perPage = $filters['per_page'] ?? 10;
+        return $query->paginate($perPage);
+    }
 
-      if (!$product) {
-        // Manejar el caso de que el producto no exista
+    /**
+     * Obtener estadísticas de productos
+     */
+    public function getStatistics(): array
+    {
         return [
-          'data' => null,
-          'error' => 'Producto no encontrado.',
+            'total' => Product::count(),
+            'active' => Product::where('is_active', true)->count(),
+            'out_of_stock' => Product::where('stock', 0)->count(),
+            'low_stock' => Product::where('stock', '>', 0)->where('stock', '<', 10)->count(),
         ];
-      }
-
-      $deletedProduct = $this->productRepository->delete($productId);
-
-      // Si la eliminación fue exitosa, devolvemos el objeto que fue eliminado
-      return [
-        'data' => $deletedProduct,
-        'error' => null,
-      ];
-    } catch (\Exception $e) {
-      // 4. Captura y Manejo de Errores
-      // Registra el error para depuración
-      Log::error("Error al eliminar el producto con ID {$productId}: " . $e->getMessage());
-
-      return [
-        'data' => null,
-        'error' => 'Error al procesar la eliminación: ' . $e->getMessage(),
-      ];
     }
-  }
 
-  public function activarProducto(int $productId): array
-  {
-    try {
-      // 1. Obtener el producto antes de eliminarlo para acceder a sus relaciones (imágenes)
-      // La implementación del Repositorio debe asegurar que las imágenes se carguen (eager loading)
-      $product = $this->productRepository->findId($productId);
-
-      if (!$product) {
-        // Manejar el caso de que el producto no exista
-        return [
-          'data' => null,
-          'error' => 'Producto no encontrado.',
-        ];
-      }
-
-      $product->is_active = true;
-      $product->save();
-
-      // Si la eliminación fue exitosa, devolvemos el objeto que fue eliminado
-      return [
-        'data' => $product,
-        'error' => null,
-      ];
-    } catch (\Exception $e) {
-      // 4. Captura y Manejo de Errores
-      // Registra el error para depuración
-      Log::error("Error al activar el producto con ID {$productId}: " . $e->getMessage());
-
-      return [
-        'data' => null,
-        'error' => 'Error al procesar la activación: ' . $e->getMessage(),
-      ];
+    /**
+     * Descontar stock de un producto
+     */
+    public function discount_stok($product_id, $quantity)
+    {
+        return $this->productRepository->discount_stok($product_id, $quantity);
     }
-  }
+
+    /**
+     * Buscar productos por nombre
+     */
+    public function buscarPorNombre($nombre)
+    {
+        return $this->productRepository->buscarPorNombre($nombre);
+    }
+
+    /**
+     * Crear un nuevo producto con imágenes
+     */
+    public function createProduct(array $data, array $images = []): array
+    {
+        DB::beginTransaction();
+
+        try {
+            // Crear producto
+            $product = $this->productRepository->create([
+                'name' => $data['name'],
+                'description' => $data['description'] ?? null,
+                'price' => $data['price'],
+                'stock' => $data['stock'],
+                'category_id' => $data['category_id'],
+                'is_active' => $data['is_active'] ?? true,
+                'sku' => $data['sku'] ?? null,
+            ]);
+
+            // Subir imágenes si existen
+            if (!empty($images)) {
+                foreach ($images as $index => $image) {
+                    $path = $this->fileService->upload ($image, 'products');
+
+                    ProductImagens::create([
+                        'product_id' => $product->id,
+                        'path' => $path,
+                        'is_primary' => $index === 0, // Primera imagen como principal
+                    ]);
+                }
+            }
+
+            DB::commit();
+
+            return [
+                'data' => $product->load('product_imagens'),
+                'error' => null,
+            ];
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            Log::error("Error al crear el producto: " . $e->getMessage());
+            
+            return [
+                'data' => null,
+                'error' => 'Error al crear el producto: ' . $e->getMessage(),
+            ];
+        }
+    }
+
+    /**
+     * Actualizar un producto existente
+     */
+    public function updateProduct(int $productId, array $data, array $newImages = [], array $imagesToDelete = []): array
+    {
+        DB::beginTransaction();
+
+        try {
+            // Buscar producto
+            $product = $this->findId($productId);
+            
+            if (!$product) {
+                return [
+                    'data' => null,
+                    'error' => 'Producto no encontrado.',
+                ];
+            }
+
+            // Actualizar datos del producto
+            $product = $this->productRepository->update($productId, [
+                'name' => $data['name'],
+                'description' => $data['description'] ?? null,
+                'price' => $data['price'],
+                'stock' => $data['stock'],
+                'category_id' => $data['category_id'],
+                'is_active' => $data['is_active'] ?? true,
+                'sku' => $data['sku'] ?? null,
+            ]);
+
+            // Eliminar imágenes marcadas
+            if (!empty($imagesToDelete)) {
+                foreach ($imagesToDelete as $imageId) {
+                    $image = ProductImagens::find($imageId);
+                    if ($image) {
+                        $this->fileService->deleteFile($image->path);
+                        $image->delete();
+                    }
+                }
+            }
+
+            // Subir nuevas imágenes
+            if (!empty($newImages)) {
+                foreach ($newImages as $image) {
+                    $path = $this->fileService->upload($image, 'products');
+
+                    ProductImagens::create([
+                        'product_id' => $product->id,
+                        'path' => $path,
+                        'is_primary' => false,
+                    ]);
+                }
+            }
+
+            DB::commit();
+
+            return [
+                'data' => $product->load('product_imagens'),
+                'error' => null,
+            ];
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            Log::error("Error al actualizar el producto con ID {$productId}: " . $e->getMessage());
+            
+            return [
+                'data' => null,
+                'error' => 'Error al actualizar el producto: ' . $e->getMessage(),
+            ];
+        }
+    }
+
+    /**
+     * Cambiar estado activo/inactivo del producto
+     */
+    public function toggleStatus(int $productId): array
+    {
+       Log::error("toggleStatus");
+        try {
+            $product = $this->findId($productId);
+            
+            if (!$product) {
+                return [
+                    'data' => null,
+                    'error' => 'Producto no encontrado.',
+                ];
+            }
+
+            $product->is_active = !$product->is_active;
+            $product->save();
+
+            return [
+                'data' => $product,
+                'error' => null,
+                'status' => $product->is_active ? 'activado' : 'desactivado',
+            ];
+
+        } catch (\Exception $e) {
+            Log::error("Error al cambiar estado del producto con ID {$productId}: " . $e->getMessage());
+            
+            return [
+                'data' => null,
+                'error' => 'Error al cambiar el estado del producto: ' . $e->getMessage(),
+            ];
+        }
+    }
+
+    /**
+     * Eliminar un producto y sus imágenes asociadas
+     */
+    public function deleteProduct(int $productId): array
+    {
+        DB::beginTransaction();
+
+        try {
+            $product = $this->findId($productId);
+            
+            if (!$product) {
+                return [
+                    'data' => null,
+                    'error' => 'Producto no encontrado.',
+                ];
+            }
+
+            // Verificar si tiene órdenes asociadas
+            if ($product->orderItems()->count() > 0) {
+                return [
+                    'data' => null,
+                    'error' => 'No se puede eliminar el producto porque tiene órdenes asociadas.',
+                ];
+            }
+
+            // Eliminar imágenes del storage
+            foreach ($product->product_imagens as $image) {
+                $this->fileService->deleteFile($image->path);
+                $image->delete();
+            }
+
+            // Eliminar producto
+            $deletedProduct = $this->productRepository->delete($productId);
+
+            DB::commit();
+
+            return [
+                'data' => $deletedProduct,
+                'error' => null,
+            ];
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            Log::error("Error al eliminar el producto con ID {$productId}: " . $e->getMessage());
+            
+            return [
+                'data' => null,
+                'error' => 'Error al eliminar el producto: ' . $e->getMessage(),
+            ];
+        }
+    }
+
+    /**
+     * Desactivar producto (soft delete)
+     */
+    public function deactivateProduct(int $productId): array
+    {
+        try {
+            $product = $this->findId($productId);
+            
+            if (!$product) {
+                return [
+                    'data' => null,
+                    'error' => 'Producto no encontrado.',
+                ];
+            }
+
+            $product->is_active = false;
+            $product->save();
+
+            return [
+                'data' => $product,
+                'error' => null,
+            ];
+
+        } catch (\Exception $e) {
+            Log::error("Error al desactivar el producto con ID {$productId}: " . $e->getMessage());
+            
+            return [
+                'data' => null,
+                'error' => 'Error al desactivar el producto: ' . $e->getMessage(),
+            ];
+        }
+    }
+
+    /**
+     * Activar producto
+     */
+    public function activeProduct(int $productId): array
+    {
+        try {
+            $product = $this->findId($productId);
+            
+            if (!$product) {
+                return [
+                    'data' => null,
+                    'error' => 'Producto no encontrado.',
+                ];
+            }
+
+            $product->is_active = true;
+            $product->save();
+
+            return [
+                'data' => $product,
+                'error' => null,
+            ];
+
+        } catch (\Exception $e) {
+            Log::error("Error al activar el producto con ID {$productId}: " . $e->getMessage());
+            
+            return [
+                'data' => null,
+                'error' => 'Error al activar el producto: ' . $e->getMessage(),
+            ];
+        }
+    }
+
+    /**
+     * Establecer una imagen como principal
+     */
+    public function setPrimaryImage(int $productId, int $imageId): array
+    {
+        try {
+            // Quitar todas las imágenes principales del producto
+            ProductImagens::where('product_id', $productId)
+                ->update(['is_primary' => false]);
+
+            // Establecer la nueva imagen principal
+            $image = ProductImagens::where('product_id', $productId)
+                ->where('id', $imageId)
+                ->first();
+
+            if (!$image) {
+                return [
+                    'data' => null,
+                    'error' => 'Imagen no encontrada.',
+                ];
+            }
+
+            $image->is_primary = true;
+            $image->save();
+
+            return [
+                'data' => $image,
+                'error' => null,
+            ];
+
+        } catch (\Exception $e) {
+            Log::error("Error al establecer imagen principal: " . $e->getMessage());
+            
+            return [
+                'data' => null,
+                'error' => 'Error al establecer imagen principal: ' . $e->getMessage(),
+            ];
+        }
+    }
 }

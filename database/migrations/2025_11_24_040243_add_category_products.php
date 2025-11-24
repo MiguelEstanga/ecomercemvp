@@ -11,8 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->boolean('active')->default(true)->after('email_verified_at');
+        Schema::table('products', function (Blueprint $table) {
+            $table->foreignId('category_id')
+            ->references('id')
+            ->on('categories')
+            ->onDelete('cascade')
+            ->nullable();
         });
     }
 
@@ -21,8 +25,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('active');
+        Schema::table('products', function (Blueprint $table) {
+            $table->dropColumn('category_id');
         });
     }
 };

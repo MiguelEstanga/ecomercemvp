@@ -42,15 +42,15 @@ class DatabaseSeeder extends Seeder
         // 3. (Opcional) Usar Faker para crear 10 usuarios aleatorios
         // A estos usuarios les podemos asignar el rol 'cliente' por defecto:
         User::factory()->count(10)->create()->each(function ($user) {
-             $user->assignRole('cliente');
+            $user->assignRole('cliente');
         });
 
         // --- LLAMADAS A OTROS SEEDERS (Que ya no dependen de los Roles) ---
         $this->call([
             PaymentMethodSeeder::class,
             PickupAgencySeeder::class,
-            ProductSeeder::class,
-            OrderSeeder::class, // Debe ir al final ya que depende de todos los anteriores
+            CategorySeeder::class,
+            ProductSeeder::class, 
         ]);
     }
 }

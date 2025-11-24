@@ -28,12 +28,12 @@ class FileService
 
             // Generar nombre único para el archivo
             $filename = $this->generateUniqueFileName($file);
-            
+
             // Guardar el archivo
             $path = $file->storeAs($folder, $filename, $disk);
-            
+
             Log::info("Archivo subido exitosamente: {$path}");
-            
+
             return $path;
         } catch (\Exception $e) {
             Log::error('Error al subir archivo: ' . $e->getMessage());
@@ -52,7 +52,7 @@ class FileService
     public function uploadMultiple(array $files, string $folder = 'uploads', string $disk = 'public'): array
     {
         $paths = [];
-        
+
         foreach ($files as $file) {
             if ($file instanceof UploadedFile) {
                 $path = $this->upload($file, $folder, $disk);
@@ -61,8 +61,19 @@ class FileService
                 }
             }
         }
-        
+
         return $paths;
+    }
+    /**
+     * Eliminar un archivo del storage
+     */
+    public function deleteFile(string $path): bool
+    {
+        if (Storage::exists($path)) {
+            return Storage::delete($path);
+        }
+
+        return false;
     }
 
     /**
@@ -80,7 +91,7 @@ class FileService
                 Log::info("Archivo eliminado: {$path}");
                 return true;
             }
-            
+
             Log::warning("Archivo no encontrado para eliminar: {$path}");
             return false;
         } catch (\Exception $e) {
@@ -99,13 +110,13 @@ class FileService
     public function deleteMultiple(array $paths, string $disk = 'public'): int
     {
         $deleted = 0;
-        
+
         foreach ($paths as $path) {
             if ($this->delete($path, $disk)) {
                 $deleted++;
             }
         }
-        
+
         return $deleted;
     }
 
@@ -174,7 +185,7 @@ class FileService
         $safeName = Str::slug($originalName);
         $timestamp = now()->timestamp;
         $random = Str::random(8);
-        
+
         return "{$safeName}_{$timestamp}_{$random}.{$extension}";
     }
 
