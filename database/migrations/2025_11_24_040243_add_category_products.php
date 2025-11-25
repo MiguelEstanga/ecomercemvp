@@ -12,11 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('products', function (Blueprint $table) {
+            // foreignId = unsignedBigInteger
             $table->foreignId('category_id')
-            ->references('id')
-            ->on('categories')
-            ->onDelete('cascade')
-            ->nullable();
+                ->nullable() // Permite NULL para evitar el error
+                ->constrained() // Mejor atajo para references('id')->on('categories')
+                ->onDelete('cascade');
         });
     }
 
