@@ -2,9 +2,9 @@
 
 return [
     'temporary_file_upload' => [
-        'disk' => env('LIVEWIRE_UPLOAD_DISK', 'local'),
-        'rules' => null,
-        'directory' => null,
+        'disk' => 'local', // Cambia a 'local' en Railway
+        'rules' => ['required', 'file', 'max:12288'], // 12MB max
+        'directory' => 'livewire-tmp',
         'middleware' => null,
         'preview_mimes' => [
             'png', 'gif', 'bmp', 'svg', 'wav', 'mp4',
@@ -13,4 +13,6 @@ return [
         ],
         'max_upload_time' => 5,
     ],
+    
+    'asset_url' => env('ASSET_URL'),
 ];
