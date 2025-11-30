@@ -7,7 +7,6 @@ use Livewire\WithPagination;
 use Livewire\WithFileUploads;
 use App\Models\Category;
 use App\services\ProductServices;
-use Illuminate\Support\Facades\URL;
 
 class ProductTable extends Component
 {
@@ -57,7 +56,7 @@ class ProductTable extends Component
             'stock' => 'required|integer|min:0',
             'category_id' => 'required|exists:categories,id',
             'is_active' => 'boolean',
-
+             
             'images.*' => 'nullable|image|max:2048',
         ];
     }
@@ -76,9 +75,6 @@ class ProductTable extends Component
     public function boot(ProductServices $productService)
     {
         $this->productService = $productService;
-        if ($this->app->environment('production')) {
-            URL::forceScheme('https');
-        }
     }
 
     // Resetear paginación al buscar
@@ -123,9 +119,10 @@ class ProductTable extends Component
     // Abrir modal de crear
     public function openCreateModal()
     {
-
+         
         $this->resetForm();
         $this->showCreateModal = true;
+         
     }
 
     // Cerrar modal de crear
