@@ -6,7 +6,7 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\WithFileUploads;
 use App\Models\Category;
-use App\Services\ProductServices;
+use App\services\ProductServices;
 
 class ProductTable extends Component
 {
