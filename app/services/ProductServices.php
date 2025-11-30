@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Repositories\ProductRepository;
-use App\Services\FileService;
+use App\services\FileService;
 use App\Models\Product;
 use App\Models\ProductImagen as ProductImagens  ;
 use Illuminate\Support\Facades\Log;
