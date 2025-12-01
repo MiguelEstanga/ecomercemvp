@@ -4,8 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Maatwebsite\Excel\Facades\Excel;
-use Illuminate\Support\Facades\URL;
-class AppServiceProvider extends ServiceProvider
+ class AppServiceProvider extends ServiceProvider
 {
     /**
      * Register any application services.
@@ -25,8 +24,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        if ($this->app->environment('production')) {
-            URL::forceScheme('https');
-        }
+         
     }
 }
