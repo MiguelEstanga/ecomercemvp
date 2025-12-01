@@ -169,7 +169,7 @@
                                                     src="/storage/{{ $cleanPath }}" 
                                                     class="w-full h-32 object-cover rounded-lg border-2 border-gray-200"
                                                 >
-                                                @if($image['is_primary'])
+                                                @if($image['is_main'])
                                                     <span class="absolute top-2 left-2 px-2 py-1 text-xs font-semibold bg-blue-600 text-white rounded">
                                                         Principal
                                                     </span>

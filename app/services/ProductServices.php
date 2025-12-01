@@ -5,7 +5,7 @@ namespace App\Services;
 use App\Repositories\ProductRepository;
 use App\services\FileService;
 use App\Models\Product;
-use App\Models\ProductImagen as ProductImagens  ;
+use App\Models\ProductImagen as ProductImagens;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -141,7 +141,7 @@ class ProductServices
             // Subir imágenes si existen
             if (!empty($images)) {
                 foreach ($images as $index => $image) {
-                    $path = $this->fileService->upload ($image, 'products');
+                    $path = $this->fileService->upload($image, 'products');
 
                     ProductImagens::create([
                         'product_id' => $product->id,
@@ -157,12 +157,11 @@ class ProductServices
                 'data' => $product->load('product_imagens'),
                 'error' => null,
             ];
-
         } catch (\Exception $e) {
             DB::rollBack();
-            
+
             Log::error("Error al crear el producto: " . $e->getMessage());
-            
+
             return [
                 'data' => null,
                 'error' => 'Error al crear el producto: ' . $e->getMessage(),
@@ -180,7 +179,7 @@ class ProductServices
         try {
             // Buscar producto
             $product = $this->findId($productId);
-            
+
             if (!$product) {
                 return [
                     'data' => null,
@@ -214,7 +213,8 @@ class ProductServices
             if (!empty($newImages)) {
                 foreach ($newImages as $image) {
                     $path = $this->fileService->upload($image, 'products');
-
+                    Log::info('Producto actualizado');
+                    Log::info($path);
                     ProductImagens::create([
                         'product_id' => $product->id,
                         'path' => $path,
@@ -229,12 +229,11 @@ class ProductServices
                 'data' => $product->load('product_imagens'),
                 'error' => null,
             ];
-
         } catch (\Exception $e) {
             DB::rollBack();
-            
+
             Log::error("Error al actualizar el producto con ID {$productId}: " . $e->getMessage());
-            
+
             return [
                 'data' => null,
                 'error' => 'Error al actualizar el producto: ' . $e->getMessage(),
@@ -247,10 +246,10 @@ class ProductServices
      */
     public function toggleStatus(int $productId): array
     {
-       Log::error("toggleStatus");
+        Log::error("toggleStatus");
         try {
             $product = $this->findId($productId);
-            
+
             if (!$product) {
                 return [
                     'data' => null,
@@ -266,10 +265,9 @@ class ProductServices
                 'error' => null,
                 'status' => $product->is_active ? 'activado' : 'desactivado',
             ];
-
         } catch (\Exception $e) {
             Log::error("Error al cambiar estado del producto con ID {$productId}: " . $e->getMessage());
-            
+
             return [
                 'data' => null,
                 'error' => 'Error al cambiar el estado del producto: ' . $e->getMessage(),
@@ -286,7 +284,7 @@ class ProductServices
 
         try {
             $product = $this->findId($productId);
-            
+
             if (!$product) {
                 return [
                     'data' => null,
@@ -317,12 +315,11 @@ class ProductServices
                 'data' => $deletedProduct,
                 'error' => null,
             ];
-
         } catch (\Exception $e) {
             DB::rollBack();
-            
+
             Log::error("Error al eliminar el producto con ID {$productId}: " . $e->getMessage());
-            
+
             return [
                 'data' => null,
                 'error' => 'Error al eliminar el producto: ' . $e->getMessage(),
@@ -337,7 +334,7 @@ class ProductServices
     {
         try {
             $product = $this->findId($productId);
-            
+
             if (!$product) {
                 return [
                     'data' => null,
@@ -352,10 +349,9 @@ class ProductServices
                 'data' => $product,
                 'error' => null,
             ];
-
         } catch (\Exception $e) {
             Log::error("Error al desactivar el producto con ID {$productId}: " . $e->getMessage());
-            
+
             return [
                 'data' => null,
                 'error' => 'Error al desactivar el producto: ' . $e->getMessage(),
@@ -370,7 +366,7 @@ class ProductServices
     {
         try {
             $product = $this->findId($productId);
-            
+
             if (!$product) {
                 return [
                     'data' => null,
@@ -385,10 +381,9 @@ class ProductServices
                 'data' => $product,
                 'error' => null,
             ];
-
         } catch (\Exception $e) {
             Log::error("Error al activar el producto con ID {$productId}: " . $e->getMessage());
-            
+
             return [
                 'data' => null,
                 'error' => 'Error al activar el producto: ' . $e->getMessage(),
@@ -425,10 +420,9 @@ class ProductServices
                 'data' => $image,
                 'error' => null,
             ];
-
         } catch (\Exception $e) {
             Log::error("Error al establecer imagen principal: " . $e->getMessage());
-            
+
             return [
                 'data' => null,
                 'error' => 'Error al establecer imagen principal: ' . $e->getMessage(),

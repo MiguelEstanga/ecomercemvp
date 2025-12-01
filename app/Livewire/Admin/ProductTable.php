@@ -57,7 +57,7 @@ class ProductTable extends Component
             'category_id' => 'required|exists:categories,id',
             'is_active' => 'boolean',
              
-            'images.*' => 'nullable|image|max:2048',
+            'images.*' => 'nullable|image|max:20480',
         ];
     }
 
