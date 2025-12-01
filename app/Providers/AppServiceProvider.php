@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Providers;
-
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Maatwebsite\Excel\Facades\Excel;
  class AppServiceProvider extends ServiceProvider
@@ -24,6 +24,8 @@ use Maatwebsite\Excel\Facades\Excel;
      */
     public function boot(): void
     {
-         
+         if ($this->app->environment('production')) {
+            URL::forceScheme('https');
+        }
     }
 }
