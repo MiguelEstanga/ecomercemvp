@@ -104,7 +104,7 @@ Route::get('/clear-all', function () {
     Artisan::call('view:clear');
     Artisan::call('optimize:clear');
 
-    return "CACHE LIMPIADA";
+     phpinfo();
 });
 
 
