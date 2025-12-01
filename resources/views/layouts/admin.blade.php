@@ -39,10 +39,8 @@
 
     {{-- Livewire Scripts --}}
     @livewireScripts
-
-    {{-- Scripts adicionales --}}
-    @stack('scripts')
-    <script>
+ 
+    {{-- <script>
         document.addEventListener('livewire:init', () => {
             const loader = document.getElementById('loader');
              
@@ -61,7 +59,7 @@
                 
             });
         });
-    </script>
+    </script> --}}
 </body>
 
 </html>
