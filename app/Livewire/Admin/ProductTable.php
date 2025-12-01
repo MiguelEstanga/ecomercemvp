@@ -7,7 +7,7 @@ use Livewire\WithPagination;
 use Livewire\WithFileUploads;
 use App\Models\Category;
 use App\services\ProductServices;
-
+use Illuminate\Support\Facades\Log;
 class ProductTable extends Component
 {
     use WithPagination, WithFileUploads;
@@ -173,7 +173,7 @@ class ProductTable extends Component
         $this->dispatch("startLoading");
         try {
             $product = $this->productService->findId($id);
-
+            Log::info($product);
             if (!$product) {
                 session()->flash('error', 'Producto no encontrado');
                 return;
@@ -186,7 +186,7 @@ class ProductTable extends Component
             $this->stock = $product->stock;
             $this->category_id = $product->category_id;
             $this->is_active = $product->is_active;
-            $this->sku = $product->sku;
+            $this->sku = $product->SKU;
             $this->existingImages = $product->product_imagens->toArray();
 
             $this->showEditModal = true;
