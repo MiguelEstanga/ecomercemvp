@@ -9,6 +9,8 @@ use App\Models\Category;
 use App\services\ProductServices;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\Auth;
+
 class ProductTable extends Component
 {
     use WithPagination, WithFileUploads;
@@ -61,7 +63,23 @@ class ProductTable extends Component
             'images.*' => 'nullable|image|max:20480',
         ];
     }
+    public function updatedImages()
+    {
+        // Verificar si el usuario está autenticado en este punto.
+        // Si la sesión se pierde, esta comprobación fallará.
+        if (!Auth::check()) {
+            // Log para el servidor
+            Log::error('LIVEWIRE FILE UPLOAD 401: Usuario no autenticado en el hook updatedImages.');
 
+            // Opcional: Esto detendrá la ejecución y te mostrará el mensaje si accedes al log
+            // dd('ERROR 401 CONFIRMADO: La sesión se perdió durante la subida de archivos.'); 
+        } else {
+            Log::info('LIVEWIRE FILE UPLOAD: Usuario autenticado correctamente.');
+        }
+
+        // Validar las nuevas imágenes tan pronto como se cargan para dar feedback rápido
+        $this->validate(['images.*' => 'nullable|image|max:20480']);
+    }
     protected $messages = [
         'name.required' => 'El nombre es obligatorio',
         'price.required' => 'El precio es obligatorio',
