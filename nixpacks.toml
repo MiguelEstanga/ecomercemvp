@@ -11,6 +11,8 @@ cmds = [
 cmds = [
     "npm run build",
     "ls -la public/build",  # Verificar que se generaron los assets
+    "chmod -R 775 storage bootstrap/cache",
+    "chmod -R 775 storage"
     "php artisan config:cache",
     "php artisan route:cache",
 
