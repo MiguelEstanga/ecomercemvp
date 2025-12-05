@@ -341,7 +341,7 @@ class ProductTable extends Component
 
         // Obtener productos con filtros
         $products = $this->productService->getProductsWithFilters($filters);
-
+       
         // Obtener categorías
         $categories = Category::all();
 
@@ -351,6 +351,7 @@ class ProductTable extends Component
         return view('livewire.admin.product-table', [
             'products' => $products,
             'categories' => $categories,
+             
             'stats' => $stats,
         ]);
     }

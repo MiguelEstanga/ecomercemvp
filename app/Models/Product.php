@@ -61,7 +61,7 @@ class Product extends Model
     }
 
     // Accessors
-    public function getFirstImageAttribute()
+    public function getFirstImageAttribute() 
     {
         $firstImage = $this->product_imagens->first();
 
@@ -70,7 +70,7 @@ class Product extends Model
             return asset('storage/' . $cleanPath);
         }
 
-        return 'https://via.placeholder.com/400x400?text=Sin+Imagen';
+        return null;
     }
 
     public function getFormattedPriceAttribute()

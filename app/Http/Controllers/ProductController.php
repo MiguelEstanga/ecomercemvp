@@ -93,20 +93,20 @@ class ProductController extends Controller
 
     public function create(Request $request)
     {
-        Log::info('creando archivo ' );
+        Log::info('creando archivo ');
         DB::beginTransaction();
         Log::info('preparndo transaction ');
         $path = null;
         if ($request->hasFile('imagen')) {
             $path = $this->fileService->upload($request->file('imagen'), 'product', 'public');
         }
-        Log::info('preparndo transaction ' );
-        Log::info(  $path);
-        try { 
-            $producto = $this->productServices->create($request);
-            Log::info('producto listo ' );
+
+        try {
+            $imagenes = $request->file('imagen');
+            $producto = $this->productServices->createProduct($request->all(), $imagenes);
+
             ProductImagen::create([
-                'product_id' => $producto->id,
+                'product_id' => $producto['data']->id,
                 'path' => $path,
                 'is_main' => true
             ]);
@@ -120,6 +120,58 @@ class ProductController extends Controller
                 $this->fileService->delete($path);
             }
             return response()->json(['message' => 'Error al crear producto'], 500);
+        }
+    }
+
+    public function update(Request $request, $id)
+    {
+        try {
+            //  return $request->all();
+            // Validar los datos de entrada
+            // $request->validate([
+            //     'name' => 'required|string|max:255',
+            //     'price' => 'required|numeric|min:0',
+            //     'stock' => 'required|integer|min:0',
+            //     'category_id' => 'required|exists:categories,id',
+            //     'SKU' => 'nullable|string|unique:products,sku,' . $id,
+            //     'imagen.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5048',
+            //     'imagenDelete.*' => 'nullable|integer|exists:product_imagens,id',
+            //     'is_active' => 'sometimes|boolean',
+            // ]);
+
+              $producto = $this->productServices->updateProduct($id, [
+                'name' => $request->name,
+                'description' => $request->description,
+                'price' => $request->price,
+                'stock' => $request->stock,
+                'category_id' => $request->category_id,
+                'is_active' => $request->is_active,
+                'SKU' => $request->sku,
+
+            ]);
+            $oldPath = $producto->getFirstImageAttribute();
+            if ($oldPath) {
+                 
+                $this->fileService->delete($oldPath, 'products');
+                 ProductImagen::where('product_id', $producto->id)->delete();
+            }
+            // Subir imágenes nuevas
+            if ($request->hasFile('imagen')) {
+                $path = $this->fileService->upload($request->file('imagen'), 'products');
+               
+                ProductImagen::create([
+                    'product_id' => $producto->id,
+                    'path' => $path,
+                    'is_primary' => true
+                ]);
+            }
+            return back()->with('success', 'Producto actualizado correctamente');
+        } catch (\Exception $e) {
+            Log::error('Error al actualizar producto ID ' . $id . ': ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
+            return 0;
+            return back()->with('error', 'Ocurrió un error al actualizar el producto: ' . $e->getMessage());
         }
     }
 }

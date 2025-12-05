@@ -172,72 +172,50 @@ class ProductServices
     /**
      * Actualizar un producto existente
      */
-    public function updateProduct(int $productId, array $data, array $newImages = [], array $imagesToDelete = []): array
+
+    private function ensureHasPrimaryImage($product)
     {
-        DB::beginTransaction();
+        $hasPrimary = $product->product_imagens()->where('is_primary', true)->exists();
 
-        try {
-            // Buscar producto
-            $product = $this->findId($productId);
-
-            if (!$product) {
-                return [
-                    'data' => null,
-                    'error' => 'Producto no encontrado.',
-                ];
+        if (!$hasPrimary) {
+            $firstImage = $product->product_imagens()->first();
+            if ($firstImage) {
+                $firstImage->update(['is_primary' => true]);
             }
+        }
+    }
 
-            // Actualizar datos del producto
-            $product = $this->productRepository->update($productId, [
+    private function shouldBePrimary($product, $index)
+    {
+        // Si no hay imagen principal, la primera nueva será principal
+        $hasPrimary = $product->product_imagens()->where('is_primary', true)->exists();
+        return !$hasPrimary && $index === 0;
+    }
+    public function updateProduct($productId, array $data)
+    {
+        try {
+            $product = Product::findOrFail($productId);
+
+            // Solo actualizar si realmente cambió algo
+            $product->fill([
                 'name' => $data['name'],
-                'description' => $data['description'] ?? null,
+                'description' => $data['description'],
                 'price' => $data['price'],
                 'stock' => $data['stock'],
                 'category_id' => $data['category_id'],
+                'SKU' => $data['SKU'],
                 'is_active' => $data['is_active'] ?? true,
-                'sku' => $data['sku'] ?? null,
             ]);
 
-            // Eliminar imágenes marcadas
-            if (!empty($imagesToDelete)) {
-                foreach ($imagesToDelete as $imageId) {
-                    $image = ProductImagens::find($imageId);
-                    if ($image) {
-                        $this->fileService->deleteFile($image->path);
-                        $image->delete();
-                    }
-                }
+            // Solo guarda si hay cambios
+            if ($product->isDirty()) {
+                $product->save();
             }
 
-            // Subir nuevas imágenes
-            if (!empty($newImages)) {
-                foreach ($newImages as $image) {
-                    $path = $this->fileService->upload($image, 'products');
-                    Log::info('Producto actualizado');
-                    Log::info($path);
-                    ProductImagens::create([
-                        'product_id' => $product->id,
-                        'path' => $path,
-                        'is_primary' => false,
-                    ]);
-                }
-            }
-
-            DB::commit();
-
-            return [
-                'data' => $product->load('product_imagens'),
-                'error' => null,
-            ];
+            return $product;
         } catch (\Exception $e) {
-            DB::rollBack();
-
-            Log::error("Error al actualizar el producto con ID {$productId}: " . $e->getMessage());
-
-            return [
-                'data' => null,
-                'error' => 'Error al actualizar el producto: ' . $e->getMessage(),
-            ];
+            Log::error("Error al actualizar producto: " . $e->getMessage());
+            throw $e;
         }
     }
 

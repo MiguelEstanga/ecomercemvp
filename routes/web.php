@@ -53,7 +53,7 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
   Route::get('/', [AdminController::class, 'main'])->name('admin.dashboard');
   Route::get('/productos', [AdminController::class, 'productos'])->name('admin.productos');
   Route::post('/productos', [ProductController::class, 'create'])->name('admin.productos.create');
-
+  Route::post('/productos/{id}', [ProductController::class, 'update'])->name('admin.productos.update');
 
   Route::prefix('order')->group(function () {
     Route::get('/', [OrderController::class, 'index'])->name('order.admin.index');
