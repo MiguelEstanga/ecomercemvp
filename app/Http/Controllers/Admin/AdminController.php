@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use  App\services\ProductServices;
-
+use App\Models\Product;
+use App\Models\User;
+use App\Models\Orders;
 class AdminController extends Controller
 {
     public $productService;
@@ -16,7 +18,16 @@ class AdminController extends Controller
     }
     public function main()
     {
-        return view('admin.main.index');
+        $productsActives = Product::where('is_active', true)->count();
+         $ventas = Orders::where('status', 'completed')->sum('total_amount');
+         
+        return view('admin.main.index', [
+            'products' => Product::count(),
+            'users' => User::count(),
+            'ordenes' => Orders::count(),
+            'productsActives' => $productsActives,
+            'ventas' => $ventas,
+        ]);
     }
 
     public function productos()
