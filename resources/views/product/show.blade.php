@@ -24,7 +24,7 @@
                         @php
                             $cleanPath = str_replace('public/', '', $product->product_imagens[0]->path);
                         @endphp
-                        <img id="mainImage" src="/storage/{{ $cleanPath }}" alt="{{ $product->name }}"
+                    <img id="mainImage" src="{{ $product->getFirstImageAttribute() }}" alt="{{ $product->name }}"
                             class="w-full h-full object-cover">
                     @else
                         <div class="w-full h-full flex items-center justify-center">
