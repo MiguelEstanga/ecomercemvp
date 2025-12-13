@@ -37,18 +37,25 @@
             Productos
         </a>
 
-        <a href="{{ route('user.admin.index') }}" 
-        class="flex items-center py-2 px-6 text-gray-400 hover:bg-gray-700 hover:text-white @if(request()->routeIs('user.admin.index')) bg-gray-900 text-white @endif">
+        <a href="{{ route('user.admin.index') }}"
+            class="flex items-center py-2 px-6 text-gray-400 hover:bg-gray-700 hover:text-white @if (request()->routeIs('user.admin.index')) bg-gray-900 text-white @endif">
             <svg class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
             </svg>
             Usuarios
         </a>
+        <a href="{{ route('contact.admin.index') }}"
+            class="flex items-center py-2 px-6 text-gray-400 hover:bg-gray-700 hover:text-white @if (request()->routeIs('contact.admin.index')) bg-gray-900 text-white @endif">
+            <svg class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+            </svg>
+            Contacto
+        </a>
 
-        
-        <a href="{{ route('agency.admin.index') }}" 
-        class="flex items-center py-2 px-6 text-gray-400 hover:bg-gray-700 hover:text-white @if(request()->routeIs('agency.admin.index')) bg-gray-900 text-white @endif">
+        <a href="{{ route('agency.admin.index') }}"
+            class="flex items-center py-2 px-6 text-gray-400 hover:bg-gray-700 hover:text-white @if (request()->routeIs('agency.admin.index')) bg-gray-900 text-white @endif">
             <svg class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>

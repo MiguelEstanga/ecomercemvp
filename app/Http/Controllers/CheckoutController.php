@@ -8,20 +8,23 @@ use App\services\ProductServices;
 use App\services\AgenciesServices;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
-
+use App\Services\ContactoService;
 class CheckoutController extends Controller
 {
     private $orderServices;
     private $productServices;
     private $agenciesServices;
+    private $contactoService;
     public function __construct(
         OrderServices $orderServices,
         ProductServices $productServices,
-        AgenciesServices $agenciesServices
+        AgenciesServices $agenciesServices,
+        ContactoService $contactoService
     ) {
         $this->orderServices = $orderServices;
         $this->productServices = $productServices;
         $this->agenciesServices = $agenciesServices;
+        $this->contactoService = $contactoService;
     }
 
     public function index($id, Request $request)
@@ -29,12 +32,14 @@ class CheckoutController extends Controller
         try {
             $product = $this->productServices->findId($id);
             $agencies = $this->agenciesServices->all();
+            $contacto = $this->contactoService->getAllContatos();
             if (!$product) {
                 return response()->json(['message' => 'Order not found'], 404);
             }
+             
             return view(
                 'checkout.index',
-                compact('product', 'request', 'agencies')
+                compact('product', 'request', 'agencies' , 'contacto')
             );
         } catch (\Exception $e) {
             Log::error('Error in CheckoutController index: ' . $e->getMessage());

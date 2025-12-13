@@ -67,6 +67,10 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
   Route::prefix("agencias")->group(function () {
     Route::get('/', [AdminController::class, 'agencias'])->name('agency.admin.index');
   });
+
+  Route::prefix("contactos")->group(function () {
+    Route::get('/', [AdminController::class, 'contactos'])->name('contact.admin.index');
+  });
 });
 // SOLO PARA DEBUGGING - ELIMINAR EN PRODUCCIÓN
 Route::get('/debug-seed', function () {

@@ -50,5 +50,10 @@ class AdminController extends Controller
         return view('admin.pickup.index');
     }
 
+    public function contactos()
+    {
+        return view('admin.contacto.index');
+    }
+
     
 }
